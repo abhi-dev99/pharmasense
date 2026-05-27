@@ -1,7 +1,7 @@
 # Supplite-Med: Predictive Epidemiological Supply Chain (AGTech45-CE01-2)
 ## Complete Requirements Analysis & Market Landscape
 
-This document scopes out the exact requirements needed to adapt your existing `supplite` architecture into an **unbeatable** predictive drug inventory system for the 24-hour hackathon. 
+This document scopes out the exact requirements needed to adapt your existing `supplite` architecture into an **unbeatable** predictive drug inventory system for the 24-hour hackatAGTech45-CE01-2hon. 
 
 ---
 
