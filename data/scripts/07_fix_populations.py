@@ -87,12 +87,17 @@ def get_conn(password):
 
 def load_census_pca(excel_path: Path) -> dict:
     """
-    Parse Census 2011 PCA Excel into {district_code: population} mapping.
+    Parse Census 2011 PCA Excel into {district_id: population} mapping.
 
-    The Census PCA Excel has columns like:
-      State Code | District Code | Name | Total Population | Rural | Urban | ...
+    Confirmed column structure (inspected 2026-06-04):
+      col 0: State       (state census code, integer)
+      col 1: District    (district census code, integer; 0 = state-level row)
+      col 6: Level       ('India', 'STATE', 'DISTRICT')
+      col 7: Name        (district/state name)
+      col 10: TOT_P     (total population)
 
-    We use State Code + District Code to match to our district IDs ({st}_{dt}).
+    District ID format matches our DB: '{State:02d}_{District:03d}'
+    Each district has 3 rows: Total / Rural / Urban — we take the first (Total).
     """
     try:
         import pandas as pd
@@ -101,37 +106,29 @@ def load_census_pca(excel_path: Path) -> dict:
 
     print(f"Loading Census PCA from: {excel_path}")
     df = pd.read_excel(excel_path, header=0)
-    df.columns = df.columns.str.strip().str.lower().str.replace(' ','_')
 
-    print(f"Columns found: {list(df.columns)}")
-
-    # Try to find the right columns — Census PCA has inconsistent column names
-    state_col  = next((c for c in df.columns if 'state' in c and 'code' in c), None)
-    dist_col   = next((c for c in df.columns if 'district' in c and 'code' in c), None)
-    pop_col    = next((c for c in df.columns if 'total' in c and 'pop' in c), None)
-    name_col   = next((c for c in df.columns if 'name' in c), None)
-
-    if not all([state_col, dist_col, pop_col]):
-        print(f"WARNING: Could not auto-detect columns. Available: {list(df.columns)}")
-        print("Edit this script to manually specify column names.")
-        return {}
-
-    # Filter to district-level rows (not state totals)
-    df = df.dropna(subset=[state_col, dist_col, pop_col])
-    df = df[df[dist_col].astype(str).str.strip() != '000']  # '000' = state total rows
+    # Filter to DISTRICT-level, Total rows only (first of each State+District group)
+    districts = df[df['Level'] == 'DISTRICT'].copy()
+    districts = districts.groupby(['State', 'District']).first().reset_index()
 
     pop_map = {}
-    for _, row in df.iterrows():
+    missing = []
+    for _, row in districts.iterrows():
         try:
-            st_code = int(float(str(row[state_col]).strip()))
-            dt_code = int(float(str(row[dist_col]).strip()))
-            pop     = int(float(str(row[pop_col]).replace(',','')))
+            st_code = int(row['State'])
+            dt_code = int(row['District'])
+            pop     = int(row['TOT_P'])
+            if st_code == 0 or dt_code == 0:
+                continue
             dist_id = f"{st_code:02d}_{dt_code:03d}"
             pop_map[dist_id] = pop
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, KeyError) as e:
+            missing.append(str(e))
             continue
 
-    print(f"Census PCA loaded: {len(pop_map)} districts with population data")
+    print(f"Census PCA loaded: {len(pop_map)} districts")
+    if missing:
+        print(f"  Skipped rows: {len(missing)}")
     return pop_map
 
 
