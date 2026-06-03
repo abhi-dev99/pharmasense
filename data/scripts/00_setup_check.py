@@ -16,9 +16,10 @@ sys.path.insert(0, str(ROOT))
 from dotenv import load_dotenv
 load_dotenv(ROOT / ".env")
 
-PASS = "✅"
-FAIL = "❌"
-WARN = "⚠️ "
+PASS = "[OK] "
+FAIL = "[ERR]"
+WARN = "[WRN]"
+
 
 errors = []
 warnings = []
