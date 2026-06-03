@@ -29,7 +29,9 @@ from tqdm import tqdm
 from supabase import create_client
 
 # ─── Config ───────────────────────────────────────────────────────────────────
-GEOJSON_PATH = ROOT / "data/raw/india_geojson/Districts.geojson"
+# The user downloaded the datameet/maps GitHub zip.
+# The shapefile is in: data/raw/india_geojson/maps-master/Districts/Census_2011/
+GEOJSON_PATH = ROOT / "data/raw/india_geojson/maps-master/Districts/Census_2011/2011_Dist.shp"
 GEOJSON_URL  = "https://raw.githubusercontent.com/datameet/maps/master/Districts/India_Districts.geojson"
 BATCH_SIZE   = 50   # districts per Supabase upsert batch
 
@@ -37,46 +39,54 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 # ─── Download if not present ───────────────────────────────────────────────────
-def download_geojson():
-    GEOJSON_PATH.parent.mkdir(parents=True, exist_ok=True)
+def ensure_geojson_available():
+    """Check that the shapefile is present. Download GeoJSON as fallback."""
     if GEOJSON_PATH.exists():
-        print(f"✅ GeoJSON already downloaded: {GEOJSON_PATH}")
-        return
+        print(f"Using shapefile: {GEOJSON_PATH}")
+        return GEOJSON_PATH
 
-    print(f"⬇️  Downloading India district GeoJSON from datameet/maps...")
-    print(f"   URL: {GEOJSON_URL}")
+    # Try alternate locations in the extracted zip
+    alternates = [
+        ROOT / "data/raw/india_geojson/maps-master/Districts/Census_2011/2011_Dist.shp",
+        ROOT / "data/raw/india_geojson/maps-master/Districts/Census_2001/2001_Dist.shp",
+        ROOT / "data/raw/india_geojson/Districts.geojson",
+    ] + list((ROOT / "data/raw/india_geojson").rglob("*.shp")) \
+      + list((ROOT / "data/raw/india_geojson").rglob("*district*.geojson")) \
+      + list((ROOT / "data/raw/india_geojson").rglob("*dist*.geojson"))
 
+    for alt in alternates:
+        if alt.exists():
+            print(f"Found at alternate path: {alt}")
+            return alt
+
+    # Nothing found locally — download
+    print(f"Shapefile not found. Downloading GeoJSON fallback...")
+    out = ROOT / "data/raw/india_geojson/Districts.geojson"
+    out.parent.mkdir(parents=True, exist_ok=True)
     r = requests.get(GEOJSON_URL, timeout=120)
-    if r.status_code != 200:
-        # Try alternate URL
-        alt_url = "https://raw.githubusercontent.com/datameet/maps/master/Districts/india_districts-simplified-100.geojson"
-        print(f"   Primary URL failed (HTTP {r.status_code}), trying alternate...")
-        r = requests.get(alt_url, timeout=120)
-
     if r.status_code == 200:
-        GEOJSON_PATH.write_bytes(r.content)
-        size_kb = len(r.content) / 1024
-        print(f"✅ Downloaded ({size_kb:.0f} KB) → {GEOJSON_PATH}")
+        out.write_bytes(r.content)
+        print(f"Downloaded ({len(r.content)//1024} KB) to {out}")
+        return out
     else:
-        print(f"❌ Download failed (HTTP {r.status_code})")
-        print(f"   Please manually download from: https://github.com/datameet/maps/tree/master/Districts")
-        print(f"   and save to: {GEOJSON_PATH}")
+        print(f"Download failed (HTTP {r.status_code}). Place shapefile at:")
+        print(f"  {GEOJSON_PATH}")
         sys.exit(1)
 
 # ─── Load + clean GeoJSON ─────────────────────────────────────────────────────
-def load_and_clean_geodataframe():
-    print(f"\n📂 Loading GeoJSON from {GEOJSON_PATH}...")
-    gdf = gpd.read_file(str(GEOJSON_PATH))
+def load_and_clean_geodataframe(path):
+    print(f"\n📂 Loading data from {path}...")
+    gdf = gpd.read_file(str(path))
     print(f"   Loaded {len(gdf)} features. CRS: {gdf.crs}")
     print(f"   Columns: {list(gdf.columns)}")
 
-    # Normalize property names (different datameet versions use different keys)
+    # Normalize property names
     col_map = {}
     cols_lower = {c.lower(): c for c in gdf.columns}
 
     district_col = cols_lower.get("district") or cols_lower.get("dtname") or cols_lower.get("dt_nm")
     state_col    = cols_lower.get("st_nm") or cols_lower.get("stname") or cols_lower.get("state")
-    census_col   = cols_lower.get("dt_cen_cd") or cols_lower.get("censuscode") or cols_lower.get("census_code")
+    census_col   = cols_lower.get("dt_cen_cd") or cols_lower.get("censuscode") or cols_lower.get("census_code") or cols_lower.get("st_cen_cd")
 
     if not district_col:
         print("❌ Cannot find district name column. Available:", list(gdf.columns))
@@ -89,15 +99,15 @@ def load_and_clean_geodataframe():
     if census_col:
         gdf = gdf.rename(columns={census_col: "census_code"})
     else:
-        print("⚠️  No census code column found — generating synthetic IDs from state+district")
+        print("⚠️  No census code column found — generating synthetic IDs")
         gdf["census_code"] = (
             gdf["state_name"].str[:3].str.upper() + "_" +
             gdf["district_name"].str[:6].str.upper().str.replace(" ", "_")
         )
 
     # Clean names
-    gdf["district_name"] = gdf["district_name"].str.strip().str.title()
-    gdf["state_name"]    = gdf["state_name"].str.strip().str.title()
+    gdf["district_name"] = gdf["district_name"].astype(str).str.strip().str.title()
+    gdf["state_name"]    = gdf["state_name"].astype(str).str.strip().str.title()
     gdf["census_code"]   = gdf["census_code"].astype(str).str.strip()
 
     # Drop nulls
@@ -112,7 +122,7 @@ def compute_spatial_attributes(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     print("\n📐 Computing centroids and areas...")
 
     # Work in WGS84 for centroids, projected CRS for area
-    gdf_wgs84 = gdf.set_crs(epsg=4326, allow_override=True)
+    gdf_wgs84 = gdf.to_crs(epsg=4326)
 
     # Centroid in WGS84 (approximate, fine for our use case)
     centroids = gdf_wgs84.geometry.centroid
@@ -121,11 +131,10 @@ def compute_spatial_attributes(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
     # Area in km² (project to Indian grid: EPSG 32643 = UTM Zone 43N)
     try:
-        gdf_proj = gdf_wgs84.to_crs(epsg=32643)
+        gdf_proj = gdf.to_crs(epsg=32643)
         gdf["area_km2"] = (gdf_proj.geometry.area / 1e6).round(2)
     except Exception as e:
         print(f"   ⚠️  Area projection failed ({e}), estimating from lat/lon")
-        # Rough estimate: 1 degree ≈ 111 km
         gdf["area_km2"] = None
 
     print(f"   Centroid range: lat {gdf['centroid_lat'].min():.2f}–{gdf['centroid_lat'].max():.2f}, "
@@ -174,30 +183,26 @@ def compute_adjacency(gdf: gpd.GeoDataFrame) -> dict[str, list[str]]:
 
     return adjacency
 
-# ─── Serialize geometry to GeoJSON string ────────────────────────────────────
-def geom_to_geojson_str(geom) -> str:
-    """Convert shapely geometry to GeoJSON string for PostGIS."""
-    return json.dumps(mapping(geom))
-
 # ─── Upload to Supabase ───────────────────────────────────────────────────────
 def upload_to_supabase(gdf: gpd.GeoDataFrame, adjacency: dict):
-    print(f"\n📤 Uploading {len(gdf)} districts to Supabase...")
+    print(f"\nUploading {len(gdf)} districts to Supabase...")
     client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
     records = []
+    id_col = "canonical_id" if "canonical_id" in gdf.columns else "census_code"
     for _, row in gdf.iterrows():
-        census_code = row["census_code"]
-        neighbors   = adjacency.get(census_code, [])
+        dist_id   = row[id_col]
+        neighbors = adjacency.get(dist_id, [])
 
         record = {
-            "id":             census_code,
+            "id":             dist_id,
             "name":           row["district_name"],
             "state":          row["state_name"],
             "centroid_lat":   float(row["centroid_lat"]) if pd.notna(row["centroid_lat"]) else None,
             "centroid_lon":   float(row["centroid_lon"]) if pd.notna(row["centroid_lon"]) else None,
             "area_km2":       float(row["area_km2"]) if pd.notna(row.get("area_km2")) else None,
             "adjacency_ids":  neighbors,
-            "population":     None,  # filled by separate census lookup
+            "population":     None,
         }
         records.append(record)
 
@@ -225,8 +230,9 @@ def save_adjacency_for_ml(gdf: gpd.GeoDataFrame, adjacency: dict):
     out_path = ROOT / "data/processed/district_index.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    ids = list(gdf["census_code"])
-    index = {id_: i for i, id_ in enumerate(ids)}
+    id_col = "canonical_id" if "canonical_id" in gdf.columns else "census_code"
+    ids    = list(gdf[id_col])
+    index  = {id_: i for i, id_ in enumerate(ids)}
 
     # Adjacency edge list for scipy sparse matrix (Phase 1 ML)
     edges = {"rows": [], "cols": [], "weights": []}
@@ -264,11 +270,11 @@ def save_adjacency_for_ml(gdf: gpd.GeoDataFrame, adjacency: dict):
 # ─── Main ─────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     print("\n" + "="*60)
-    print("  Script 01 — Load India District GeoJSON")
+    print("  Script 01 -- Load India District GeoJSON / Shapefile")
     print("="*60)
 
-    download_geojson()
-    gdf = load_and_clean_geodataframe()
+    src_path = ensure_geojson_available()
+    gdf = load_and_clean_geodataframe(src_path)
     gdf = compute_spatial_attributes(gdf)
     adjacency = compute_adjacency(gdf)
     save_adjacency_for_ml(gdf, adjacency)

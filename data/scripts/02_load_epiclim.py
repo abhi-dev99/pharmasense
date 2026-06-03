@@ -42,18 +42,40 @@ SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 # EpiClim disease name → our normalized name
 DISEASE_MAP = {
-    "dengue":                        "dengue",
-    "malaria":                       "malaria",
-    "cholera":                       "cholera",
-    "acute diarrhoeal disease":      "acute_diarrhoeal_disease",
-    "acute diarrheal disease":       "acute_diarrhoeal_disease",
-    "acute diarrhoea":               "acute_diarrhoeal_disease",
-    "add":                           "acute_diarrhoeal_disease",
-    "aes":                           None,   # Acute Encephalitis Syndrome — not in our scope
-    "leptospirosis":                 None,
-    "typhoid":                       None,
-    "viral hepatitis":               None,
-    "scrub typhus":                  None,
+    # Dengue variants
+    "dengue":                               "dengue",
+    "dengue fever":                         "dengue",
+    "suspected dengue":                     "dengue",
+    "dengue and chikungunya":               "dengue",   # dengue component
+    "dengue and malaria":                   "dengue",   # dengue component
+    "dengue/chikungunya":                   "dengue",
+    "dengue chikungunya":                   "dengue",
+    "suspected dengue and chikungunya":     "dengue",
+    "chikungunya/dengue":                   "dengue",
+    "chikungunya/ dengue":                  "dengue",
+    # Malaria variants
+    "malaria":                              "malaria",
+    "malaria (pv)":                         "malaria",  # Plasmodium vivax
+    "malaria (pf)":                         "malaria",  # Plasmodium falciparum
+    # Cholera variants
+    "cholera":                              "cholera",
+    "suspected cholera":                    "cholera",
+    # ADD variants
+    "acute diarrhoeal disease":             "acute_diarrhoeal_disease",
+    "acute diarrheal disease":              "acute_diarrhoeal_disease",
+    "acute gastroenteritis":                "acute_diarrhoeal_disease",
+    "gastroenteritis":                      "acute_diarrhoeal_disease",
+    "diarrhea":                             "acute_diarrhoeal_disease",
+    "diarrhoea":                            "acute_diarrhoeal_disease",
+    # Excluded — not in scope
+    "acute encephalitis syndrome":          None,
+    "chikungunya":                          None,  # not in ICMR protocol scope
+    "suspected chikungunya":               None,
+    "pyrexia of unknown origin":            None,
+    "leptospirosis":                        None,
+    "typhoid":                              None,
+    "viral hepatitis":                      None,
+    "scrub typhus":                         None,
 }
 
 TARGET_DISEASES = {"dengue", "malaria", "cholera", "acute_diarrhoeal_disease"}
@@ -342,12 +364,18 @@ if __name__ == "__main__":
     print("="*60)
 
     # Find or download CSV
-    existing = list(EPICLIM_PATH.glob("*.csv")) if EPICLIM_PATH.exists() else []
-    if existing:
-        csv_path = existing[0]
-        print(f"✅ Using existing file: {csv_path.name}")
+    # Prefer Final_data.csv (the main data file from the Zenodo download)
+    final_csv = EPICLIM_PATH / "Final_data.csv"
+    if final_csv.exists():
+        csv_path = final_csv
+        print(f"Using EpiClim file: {csv_path.name}")
     else:
-        csv_path = download_epiclim()
+        existing = list(EPICLIM_PATH.glob("*.csv")) if EPICLIM_PATH.exists() else []
+        if existing:
+            csv_path = existing[0]
+            print(f"Using EpiClim file: {csv_path.name}")
+        else:
+            csv_path = download_epiclim()
 
     df = load_and_clean_epiclim(csv_path)
 

@@ -158,47 +158,57 @@ def clean_medicines(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_").str.replace(r"[^a-z0-9_]", "", regex=True)
     print(f"   Columns: {list(df.columns)}")
 
-    # Handle different column name variants
+    # Actual columns from this dataset:
+    # alphabet, page, product_name, image_url, medicine_name, price, is_prescription_required, type_of_medicine, composition
+    # Rename to standard names
     col_map = {
-        "name": "med_name",
-        "medicine_name": "med_name",
-        "price": "price_inr",
-        "mrp": "price_inr",
-        "is_discontinued": "is_discontinued",
-        "discontinued": "is_discontinued",
-        "manufacturer_name": "manufacturer",
-        "type": "med_type",
-        "pack_size_label": "pack_label",
-        "short_composition1": "composition1",
-        "short_composition2": "composition2",
-        "sub_category": "subcategory",
-        "id": "source_id",
+        "medicine_name":              "med_name",
+        "name":                       "med_name",
+        "price":                      "price_raw",
+        "mrp":                        "price_raw",
+        "is_prescription_required":   "rx_required",
+        "is_discontinued":            "is_discontinued",
+        "type_of_medicine":           "type_raw",
+        "type":                       "type_raw",
+        "composition":                "composition_raw",
+        "short_composition1":         "composition_raw",
+        "manufacturer_name":          "manufacturer",
     }
     df = df.rename(columns={k: v for k, v in col_map.items() if k in df.columns})
 
-    # Filter out discontinued
-    if "is_discontinued" in df.columns:
-        before = len(df)
-        df["is_discontinued"] = df["is_discontinued"].astype(str).str.lower().isin(
-            ["true", "1", "yes", "discontinued"]
-        )
-        df = df[~df["is_discontinued"]].copy()
-        print(f"   After removing discontinued: {len(df):,} rows (removed {before - len(df):,})")
+    # This dataset's 'type_of_medicine' column contains garbled data
+    # (e.g. 'strip of 10 tabletsAlpic Biotech LtdAspirin') -- extract formulation from it + from med_name
+    # Mark all as active (dataset doesn't have is_discontinued)
+    df["is_discontinued"] = False
 
     # Ensure we have composition column
-    comp_col = "composition1" if "composition1" in df.columns else None
+    comp_col = None
+    for candidate in ["composition_raw", "composition", "composition1", "short_composition1"]:
+        if candidate in df.columns:
+            comp_col = candidate
+            break
+
     if not comp_col:
         # Try to find any composition-like column
         comp_cols = [c for c in df.columns if "compos" in c or "ingredient" in c or "active" in c]
         comp_col = comp_cols[0] if comp_cols else None
 
-    if not comp_col:
-        print("⚠️  No composition column found — will use medicine name for generic extraction")
-        df["composition1"] = df.get("med_name", "")
+    if comp_col and comp_col != "composition_raw":
+        df["composition_raw"] = df[comp_col].fillna("").astype(str)
+    elif "composition_raw" not in df.columns:
+        # Last resort: use med_name
+        df["composition_raw"] = df.get("med_name", pd.Series(dtype=str)).fillna("")
+    else:
+        df["composition_raw"] = df["composition_raw"].fillna("").astype(str)
 
-    df["composition_raw"] = df[comp_col].fillna("").astype(str)
-
-    return df
+    # Clean price: strip currency symbols (dataset has prices like '168' or '₹168')
+    if "price_raw" in df.columns:
+        df["price_inr"] = pd.to_numeric(
+            df["price_raw"].astype(str).str.replace(r"[^\d.]", "", regex=True),
+            errors="coerce"
+        )
+    else:
+        df["price_inr"] = None
 
 # ─── Extract generic name + dose ─────────────────────────────────────────────
 def extract_generic_info(composition: str) -> dict:
@@ -230,8 +240,12 @@ def extract_generic_info(composition: str) -> dict:
     return {"generic_name": generic_name if generic_name else None, "dose_mg": dose_mg}
 
 # ─── Determine formulation type ───────────────────────────────────────────────
-def extract_formulation(med_type: str, pack_label: str) -> str:
-    text = f"{med_type} {pack_label}".lower()
+def extract_formulation(type_raw: str, med_name: str) -> str:
+    """Extract formulation from the garbled type_of_medicine column + medicine name."""
+    # The type_of_medicine field in this dataset is scraped and garbled,
+    # e.g. 'strip of 10 tabletsAlpic Biotech LtdAspirin'
+    # We extract from med_name which is cleaner: 'Paracetamol 500mg Tablet'
+    text = f"{type_raw} {med_name}".lower()
     for keyword, ftype in FORMULATION_MAP.items():
         if keyword in text:
             return ftype
@@ -269,12 +283,16 @@ def filter_and_dedup(df: pd.DataFrame) -> pd.DataFrame:
 
     df["formulation_type"] = df.apply(
         lambda r: extract_formulation(
-            str(r.get("med_type", "")),
-            str(r.get("pack_label", ""))
+            str(r.get("type_raw", "")),
+            str(r.get("med_name", ""))
         ), axis=1
     )
 
-    df["pack_size_units"] = df.get("pack_label", pd.Series(dtype=str)).apply(extract_pack_size)
+    # Pack size: extract from med_name or type_raw
+    df["pack_size_units"] = df.apply(
+        lambda r: extract_pack_size(str(r.get("type_raw", "")) + " " + str(r.get("med_name", ""))),
+        axis=1
+    )
 
     df["icmr_diseases"] = df.apply(
         lambda r: get_icmr_diseases(r["generic_name"], r["composition_raw"]), axis=1
@@ -321,17 +339,18 @@ def upload_drugs(df: pd.DataFrame, client):
 
     records = []
     for _, row in df.iterrows():
+        name = str(row.get("med_name", row.get("generic_name", "")))
         records.append({
-            "name":             str(row.get("med_name", row.get("generic_name", "")))[:255],
+            "name":             name[:255],
             "generic_name":     str(row["generic_name"])[:100],
             "dose_mg":          float(row["dose_mg"]) if pd.notna(row.get("dose_mg")) else None,
             "formulation_type": str(row.get("formulation_type", "other"))[:50],
             "pack_size_units":  int(row["pack_size_units"]) if pd.notna(row.get("pack_size_units")) else None,
             "price_inr":        float(row["price_inr"]) if pd.notna(row.get("price_inr")) else None,
-            "manufacturer_name": str(row.get("manufacturer", ""))[:255] if pd.notna(row.get("manufacturer")) else None,
+            "manufacturer_name": None,   # not cleanly available in this dataset
             "icmr_diseases":    row["icmr_diseases"],
             "is_active":        True,
-            "external_1mg_id":  int(row["source_id"]) if pd.notna(row.get("source_id")) else None,
+            "external_1mg_id":  None,    # no integer ID in this dataset
         })
 
     success = 0
