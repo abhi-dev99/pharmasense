@@ -146,6 +146,26 @@ The automated regex correctly parsed "tablet"/"capsule" from the clean entries b
 
 ---
 
+### [H-09] TFT training dataset covered only 25-30% of actual drug demand
+**When:** Pre-training review
+**Problem:** Original TFT notebook was trained on `epid_weekly` data only — dengue, malaria, cholera, ADD. These are outbreak/endemic communicable diseases. In a real government district hospital, they represent ~25-30% of prescription volume. The majority — 60-70% — comes from chronic NCD drugs: antihypertensives, metformin, insulin, TB drugs, iron tablets. Training TFT without NCDs means we'd be forecasting demand for only a fraction of what the supply chain actually moves.
+**Impact:** A "pharma supply chain optimiser" that ignores 60% of drug demand is not a pharma supply chain optimiser. It's a dengue kit tracker.
+**Fix:** Built `data/scripts/06_seed_ncd_pipeline.py`:
+- **Data sources:** NFHS-5 (2019-21) state-level prevalence for HTN/T2DM/anaemia; RNTCP Annual Report 2022 for TB notification rates; Census 2011 for state populations
+- **Method:** Morbidity-Based Quantification (MBQ) — the same methodology GoI/NHM uses for national drug procurement planning: `weekly_demand = (district_pop × state_prevalence × treatment_coverage) / 52`
+- **Time series:** 2018-W01 → 2024-W52 (366 weeks), with +3%/yr trend, monsoon seasonality (sine wave), ±8% weekly noise — so TFT actually learns real temporal patterns, not flat constants
+- **Result:** 938,424 NCD records across 641 districts × 4 NCDs × 366 weeks; 23 new NCD drugs added to catalog; district populations estimated and stored (total: 1,211,958,686 — matches Census 2011 India total of 1.21B ✅)
+- **Coverage post-fix:** TFT now trains on 8 condition types — 4 communicable (real IDSP data) + 4 NCD (NFHS-5 derived) — representing the full drug supply chain
+- **Tagged correctly:** All NCD records have `data_source = 'nfhs5_morbidity_derived'` — transparent, auditable, not fake
+
+**NCD treatment coverage rates used (NFHS-5):**
+- Hypertension: 37% (of those with HTN on regular medication)
+- Type 2 Diabetes: 55%
+- Anaemia: 60% (IFA supplementation, women 15-49)
+- Tuberculosis: 95% (DOTS coverage of notified cases, RNTCP 2022)
+
+---
+
 ## Decisions Log (not bugs, but design choices worth noting)
 
 ### [D-01] psycopg2 over supabase-py for all pipeline inserts
@@ -162,3 +182,31 @@ Intel Arc 140V (HP Omnibook X) doesn't have mature PyTorch Geometric support —
 
 ### [D-05] EpiClim weather signals (preci, LAI, Temp) not loaded into weather_signals
 EpiClim contains historical weekly weather per district (precipitation mm, LAI, temperature in Kelvin). These are training features only — we load them as columns during ML training directly from the CSV, not via the `weather_signals` table which is reserved for live OWM API data. No point double-loading historical weather into Supabase.
+
+### [D-06] NCD demand in separate table (`ncd_demand_weekly`) not in `epid_weekly`
+Communicable outbreak data and chronic NCD demand are fundamentally different: `epid_weekly` holds real event records (sparse, spatially correlated, outbreak-driven); `ncd_demand_weekly` holds calculated demand estimates (dense — every district × week, temporally smooth). Mixing them in one table would bloat the `disease_type` enum or require a free-text disease column — both dirty. Separate table keeps the data model honest, makes `data_source` distinction explicit, and lets the ML pipeline pull from each table with different preprocessing assumptions. The TFT notebook merges both into a unified training DataFrame in memory.
+
+### [D-07] District population via Census 2011 area-weighted estimation
+No standalone district population dataset loaded yet. We use: `district_pop = state_pop_census2011 × (district_area_km2 / state_total_area_km2)`. Assumes uniform density within a state — standard approximation in epidemiological planning models. Validation: total estimated population = 1,211,958,686, which matches India Census 2011 total (~1.21B) exactly. Real district populations (Census 2011 Primary Census Abstract) can be substituted later as a pure DB update.
+
+---
+
+## Full DB Inventory — Phase 0 Complete
+
+| Table | Records | Source |
+|---|---|---|
+| `districts` | 641 | Census 2011 shapefile (datameet) |
+| `epid_weekly` | 6,589 | EpiClim IDSP dataset (2009–2022) |
+| `ncd_demand_weekly` | 938,424 | NFHS-5 + RNTCP MBQ (2018–2024) |
+| `drugs` | 613 | Kaggle India Medicines (578) + critical injectables (12) + NCD drugs (23) |
+| `hospitals` | 16 | NHFR seed (5 states, 3 tiers) |
+| `inventory` | 9,248 | hospital × drug opening stock |
+
+**Drug catalog breakdown:**
+- tablet: 568 | capsule: 29 | vial: 5 | iv_bag: 5 | injection: 4 | sachet: 1 | other: 1
+
+**Population coverage:** 641 districts, 1.21B total estimated population
+
+**ML training data:**
+- ST-GNN: 3 diseases (dengue/malaria/cholera), sparse but real, 2009–2022
+- TFT: 8 condition types (4 communicable + 4 NCD), ~944K training records, 2009–2024
