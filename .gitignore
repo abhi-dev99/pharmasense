@@ -1,0 +1,55 @@
+.rocketride/
+
+# ── Secrets ────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ── ML Artifacts (large binary files) ─────────────────
+ml/artifacts/*.pt
+ml/artifacts/*.onnx
+ml/artifacts/*.pkl
+ml/artifacts/*.bin
+
+# ── Raw Datasets (large, re-downloadable) ─────────────
+data/raw/
+*.csv
+*.parquet
+*.h5
+*.hdf5
+
+# ── Python ────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# ── Node / Next.js ────────────────────────────────────
+node_modules/
+.next/
+out/
+.vercel/
+
+# ── Go ────────────────────────────────────────────────
+gateway/vendor/
+
+# ── MLflow ────────────────────────────────────────────
+mlruns/
+
+# ── OS ────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Excluded folders ───────────────────────────────────
+supplite/
+
