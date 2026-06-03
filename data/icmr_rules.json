@@ -1,0 +1,240 @@
+{
+  "_meta": {
+    "source": "ICMR Standard Treatment Workflows (stw.icmr.org.in) + WHO treatment protocols",
+    "version": "1.0",
+    "last_updated": "2026-06-03",
+    "severity_default_split": {"mild_pct": 0.80, "severe_pct": 0.20},
+    "notes": "dose_per_case = total units consumed per case over full treatment course"
+  },
+  "dengue": {
+    "_target_diseases": ["dengue"],
+    "mild": {
+      "description": "Dengue fever without warning signs — outpatient management",
+      "drugs": {
+        "paracetamol_500mg_tablet": {
+          "dose_per_case": 24,
+          "unit": "tablets",
+          "duration_days": 3,
+          "dosing_note": "500mg every 6h for 3 days, avoid aspirin/NSAIDs"
+        },
+        "ors_sachet_27g": {
+          "dose_per_case": 9,
+          "unit": "sachets",
+          "duration_days": 3,
+          "dosing_note": "1L ORS per day for 3 days, encourage oral fluids"
+        }
+      }
+    },
+    "severe": {
+      "description": "Dengue with warning signs or severe dengue — inpatient",
+      "drugs": {
+        "paracetamol_500mg_tablet": {
+          "dose_per_case": 24,
+          "unit": "tablets",
+          "duration_days": 3,
+          "dosing_note": "500mg every 6h, continue during admission"
+        },
+        "ringer_lactate_500ml_iv_bag": {
+          "dose_per_case": 8,
+          "unit": "bags",
+          "duration_days": 2,
+          "dosing_note": "Crystalloid fluid resuscitation at 5-10 mL/kg/hr, titrate to HR and BP"
+        },
+        "iv_normal_saline_500ml_bag": {
+          "dose_per_case": 4,
+          "unit": "bags",
+          "duration_days": 1,
+          "dosing_note": "Maintenance fluid after initial resuscitation"
+        },
+        "iv_cannula_18g": {
+          "dose_per_case": 2,
+          "unit": "pieces",
+          "duration_days": 2,
+          "dosing_note": "IV access for fluid therapy"
+        }
+      }
+    }
+  },
+  "malaria": {
+    "_target_diseases": ["malaria"],
+    "vivax_mild": {
+      "description": "Plasmodium vivax — uncomplicated, outpatient",
+      "drugs": {
+        "chloroquine_250mg_tablet": {
+          "dose_per_case": 10,
+          "unit": "tablets",
+          "duration_days": 3,
+          "dosing_note": "600mg stat, 300mg at 6h, 300mg daily for 2 days (total 1500mg base)"
+        },
+        "primaquine_15mg_tablet": {
+          "dose_per_case": 14,
+          "unit": "tablets",
+          "duration_days": 14,
+          "dosing_note": "0.25mg/kg/day for 14 days (radical cure); screen G6PD before use"
+        }
+      }
+    },
+    "falciparum_mild": {
+      "description": "Plasmodium falciparum — uncomplicated, ACT per NCVBDC",
+      "drugs": {
+        "artemether_lumefantrine_tablet_80_480mg": {
+          "dose_per_case": 24,
+          "unit": "tablets",
+          "duration_days": 3,
+          "dosing_note": "4 tablets BD for 3 days (weight >35kg); take with fatty food"
+        },
+        "primaquine_45mg_tablet": {
+          "dose_per_case": 1,
+          "unit": "tablets",
+          "duration_days": 1,
+          "dosing_note": "Single dose gametocytocidal; do not use in G6PD deficiency"
+        }
+      }
+    },
+    "severe": {
+      "description": "Severe malaria (any species) — inpatient, parenteral",
+      "drugs": {
+        "artesunate_injection_60mg": {
+          "dose_per_case": 9,
+          "unit": "vials",
+          "duration_days": 3,
+          "dosing_note": "2.4mg/kg IV at 0h, 12h, 24h, then daily until oral therapy possible"
+        },
+        "artemether_lumefantrine_tablet_80_480mg": {
+          "dose_per_case": 24,
+          "unit": "tablets",
+          "duration_days": 3,
+          "dosing_note": "Oral ACT to complete course after parenteral"
+        },
+        "ringer_lactate_500ml_iv_bag": {
+          "dose_per_case": 4,
+          "unit": "bags",
+          "duration_days": 1,
+          "dosing_note": "Supportive IV fluids, avoid overhydration"
+        },
+        "dextrose_50pct_25ml": {
+          "dose_per_case": 4,
+          "unit": "vials",
+          "duration_days": 1,
+          "dosing_note": "For hypoglycaemia management (common in severe malaria)"
+        }
+      }
+    }
+  },
+  "cholera": {
+    "_target_diseases": ["cholera"],
+    "mild_moderate": {
+      "description": "Cholera with mild-moderate dehydration (WHO Plan B)",
+      "drugs": {
+        "ors_sachet_27g": {
+          "dose_per_case": 18,
+          "unit": "sachets",
+          "duration_days": 3,
+          "dosing_note": "75mL/kg ORS over 4h, then maintain; 1L per large watery stool"
+        },
+        "zinc_20mg_tablet": {
+          "dose_per_case": 14,
+          "unit": "tablets",
+          "duration_days": 14,
+          "dosing_note": "20mg/day for 14 days (adults); reduces duration and recurrence"
+        },
+        "doxycycline_100mg_capsule": {
+          "dose_per_case": 2,
+          "unit": "capsules",
+          "duration_days": 1,
+          "dosing_note": "Single 300mg dose (3 capsules) — WHO recommended antibiotic for cholera"
+        }
+      }
+    },
+    "severe": {
+      "description": "Cholera with severe dehydration (WHO Plan C) — inpatient",
+      "drugs": {
+        "ringer_lactate_500ml_iv_bag": {
+          "dose_per_case": 12,
+          "unit": "bags",
+          "duration_days": 1,
+          "dosing_note": "100mL/kg RL rapidly over 3h (adults); switch to ORS when can drink"
+        },
+        "ors_sachet_27g": {
+          "dose_per_case": 12,
+          "unit": "sachets",
+          "duration_days": 2,
+          "dosing_note": "ORS once oral route established"
+        },
+        "doxycycline_100mg_capsule": {
+          "dose_per_case": 3,
+          "unit": "capsules",
+          "duration_days": 1,
+          "dosing_note": "Single 300mg dose as antibiotic"
+        },
+        "azithromycin_500mg_tablet": {
+          "dose_per_case": 2,
+          "unit": "tablets",
+          "duration_days": 1,
+          "dosing_note": "Alternative to doxycycline; 1g single dose"
+        },
+        "iv_normal_saline_500ml_bag": {
+          "dose_per_case": 4,
+          "unit": "bags",
+          "duration_days": 1,
+          "dosing_note": "If Ringer's Lactate unavailable"
+        }
+      }
+    }
+  },
+  "acute_diarrhoeal_disease": {
+    "_target_diseases": ["acute_diarrhoeal_disease", "add"],
+    "mild_moderate": {
+      "description": "Acute Diarrhoeal Disease — outpatient ORS-based (IDSP classification)",
+      "drugs": {
+        "ors_sachet_27g": {
+          "dose_per_case": 9,
+          "unit": "sachets",
+          "duration_days": 3,
+          "dosing_note": "WHO ORS: 200-400mL per loose stool, 750mL/day maintenance"
+        },
+        "zinc_20mg_tablet": {
+          "dose_per_case": 14,
+          "unit": "tablets",
+          "duration_days": 14,
+          "dosing_note": "20mg/day for 14 days (adults); reduces episode duration by 25%"
+        },
+        "metronidazole_400mg_tablet": {
+          "dose_per_case": 9,
+          "unit": "tablets",
+          "duration_days": 3,
+          "dosing_note": "400mg TDS for 3 days if protozoal/amoebic suspected"
+        }
+      }
+    },
+    "severe": {
+      "description": "Acute Diarrhoeal Disease with severe dehydration — inpatient",
+      "drugs": {
+        "ringer_lactate_500ml_iv_bag": {
+          "dose_per_case": 8,
+          "unit": "bags",
+          "duration_days": 1,
+          "dosing_note": "Aggressive rehydration: 100mL/kg over 3h then reassess"
+        },
+        "ors_sachet_27g": {
+          "dose_per_case": 6,
+          "unit": "sachets",
+          "duration_days": 2,
+          "dosing_note": "Transition to oral rehydration when tolerated"
+        },
+        "zinc_20mg_tablet": {
+          "dose_per_case": 14,
+          "unit": "tablets",
+          "duration_days": 14,
+          "dosing_note": "Continue zinc supplementation throughout"
+        },
+        "cefixime_200mg_tablet": {
+          "dose_per_case": 10,
+          "unit": "tablets",
+          "duration_days": 5,
+          "dosing_note": "For bacterial ADD (Shigella/Salmonella) — 200mg BD for 5 days"
+        }
+      }
+    }
+  }
+}
