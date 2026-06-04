@@ -210,3 +210,123 @@ No standalone district population dataset loaded yet. We use: `district_pop = st
 **ML training data:**
 - ST-GNN: 3 diseases (dengue/malaria/cholera), sparse but real, 2009–2022
 - TFT: 8 condition types (4 communicable + 4 NCD), ~944K training records, 2009–2024
+
+---
+
+## Phase 0b — Symptomatic Coverage + Drug Catalog Fix
+
+### [H-10] Systemic scope gap: 60%+ of OPD drug demand was unmodelled
+**When:** Post Phase-0 audit (2026-06-04)
+**Problem:** Original disease scope covered only communicable diseases (dengue/malaria/cholera/ADD) and 4 NCDs (HTN/T2DM/TB/Anaemia). Missing entirely: viral fever, URTI, gastritis, musculoskeletal pain, asthma, helminths, UTI, maternal supplements. These together represent ~40–50% of OPD visit volume at India PHCs.
+**Why it happened:** Scope was defined around IDSP data availability, not around full PHC drug demand. Symptomatic conditions are not reportable diseases so no IDSP data exists — the absence of data caused them to be missed, not a conscious exclusion.
+**Fix:** `data/scripts/08_seed_symptomatic_pipeline.py` — 7 new condition types added to `ncd_demand_weekly` using MBQ from authoritative sources:
+- viral_fever_urti: NSSO 75th Round (2017-18) ailment share 22.8% of OPD
+- acute_gastritis_dyspepsia: NSSO 75th Round GI ailment share 8.2%
+- musculoskeletal_pain: GBD 2019 India LBP 7.1% + arthritis 5.5%
+- asthma_copd_respiratory: GBD 2019 India asthma 3.5% + COPD 7.4% of adults 40+
+- helminth_infestation: WHO NTD India 2022 NDD coverage (220M children)
+- uti_bacterial_infections: ICMR AMR Surveillance 2023 (5% adults/year)
+- maternal_anc_supplements: NFHS-5 CBR 19.7/1000 + ANC coverage 85%
+**Result:** 1,642,242 new records. Total ncd_demand_weekly = 2,580,666. Condition types = 11.
+
+---
+
+### [H-11] Drug catalog missing most-prescribed drug in India
+**When:** Drug catalog audit (2026-06-04)
+**Problem:** Script 03_load_medicines.py filters by `ICMR_DRUG_DISEASE_MAP` which only maps drugs to 4 communicable diseases. This silently discarded ALL oral symptomatic drugs from the Kaggle dataset. Paracetamol 500mg oral tablet — the highest-volume drug at any Indian PHC — was not in the DB. Only the IV paracetamol infusion (1g/100ml) existed, seeded by script 05 for inpatient use.
+**Impact:** Supply chain system that doesn't model demand for paracetamol is not a supply chain system.
+**Fix:** 31 essential drugs hardcoded in `08_seed_symptomatic_pipeline.py` Step 3:
+- Paracetamol 500mg Tablet, Ibuprofen 400mg, Cetirizine 10mg, Pantoprazole 40mg
+- Amoxicillin 500mg, Ciprofloxacin 500mg, Cotrimoxazole 480mg, Doxycycline 100mg
+- Albendazole 400mg, Salbutamol 100mcg inhaler, Budesonide 200mcg inhaler
+- Calcium Carbonate 500mg, Vitamin D3 60000IU sachet, Levothyroxine 50/100mcg
+- Clotrimazole 1% cream, Permethrin 5% cream, Zinc 20mg, and more
+**Final catalog:** 644 active drug SKUs (up from 613).
+
+---
+
+### [D-08] Prophet model was planned in stack.md from day one but never implemented
+**When:** 7-model audit (2026-06-04)
+**Context:** stack.md line 84 explicitly lists "Prophet (fallback forecaster if model artifacts missing)" as part of the FastAPI ML Service. The 4 training notebooks (01-04) + LP optimizer + ensemble covered only 6 items, leaving Prophet unbuilt.
+**Decision:** Add Prophet as notebook 05, Isolation Forest as 06, LightGBM as 07.
+Rationale: All 3 are CPU-only (no Colab GPU needed), each adds a distinct non-overlapping capability, and Prophet specifically closes the gap in the originally planned architecture.
+
+---
+
+### [D-09] NVBDCP data is yearly — use temporal disaggregation
+**When:** Data planning (2026-06-04)
+**Context:** User identified NVBDCP annual reports as the source for malaria/dengue district data. Data is annual totals per district, not weekly.
+**Decision:** Get malaria + dengue only (kala-azar/filariasis require ENUM schema changes). Disaggregate annual totals to weekly using validated seasonal multipliers (malaria: monsoon + post-monsoon peak June-October; dengue: post-monsoon peak August-November). Insert with data_source = 'nvbdcp_annual_disaggregated'. This is standard NCDC India methodology.
+
+---
+
+### [D-10] New model candidates evaluated — selected Prophet, Isolation Forest, LightGBM
+**When:** Model gap analysis (2026-06-04)
+**Top 5 evaluated:**
+1. Prophet — selected (CPU, interpretable, already planned)
+2. Isolation Forest — selected (CPU, outbreak early warning, strong demo story)
+3. LightGBM — selected (CPU, 30sec training, feature importances for explainability)
+4. DeepAR — rejected (overlaps TFT, requires GPU)
+5. SARIMA — rejected (per-series only, slow for 641 districts, Prophet is strictly better)
+
+---
+
+## DB Inventory After Phase 0b
+
+| Table | Records | Source |
+|---|---|---|
+| `districts` | 641 | Census 2011 shapefile |
+| `epid_weekly` | 6,589 | EpiClim IDSP (2009–2022) |
+| `ncd_demand_weekly` | 2,580,666 | NFHS-5 + RNTCP + NSSO/GBD/WHO MBQ (2018–2024) |
+| `drugs` | 644 | Kaggle (578) + injectables (12) + NCD (23) + symptomatic (31) |
+| `hospitals` | 16 | NHFR seed |
+| `inventory` | 9,248 | hospital × drug opening stock |
+| `weather_signals` | 0 | OWM key in .env — seeding pending |
+
+**ML training data after Phase 0b:**
+- TFT: 11 condition types (4 communicable + 7 NCD/symptomatic), 2,580,666 training records, 2009–2024
+- ST-GNN/GWN: unchanged (4 communicable diseases, real IDSP data)
+- Prophet (05), Isolation Forest (06), LightGBM (07): to be built next
+
+---
+
+## Phase 1 — ML Model Notebooks
+
+### [D-11] 3 new model notebooks built + NVBDCP parser written (2026-06-04)
+
+**Notebooks created:**
+- `ml/notebooks/05_train_prophet.ipynb` — Prophet baseline forecaster
+  - Trains 1 model per condition type (11 total), Fourier yearly seasonality, India holiday effects (NDD, World TB Day, monsoon onset), 90% prediction intervals matching LP optimizer q90
+  - Runs on CPU, ~5 min. Saves `prophet_models_v1.pkl` + 8-week ahead forecast CSV
+- `ml/notebooks/06_train_anomaly_detector.ipynb` — Isolation Forest outbreak early warning
+  - Features: lagged cases, rolling stats, z-score, seasonality encoding, week-over-week velocity
+  - 1 model per disease (4 diseases), contamination=0.03 (3% outlier rate)
+  - Saves `isolation_forest_v1.pkl` + `anomaly_scores_historical.parquet`
+  - Integration: scores feed `risk_scores` table → Kafka `outbreak_events` → LP urgency = CRITICAL
+- `ml/notebooks/07_train_lgbm_demand.ipynb` — LightGBM quantile demand forecasting
+  - 3 quantile models (q10/q50/q90), 24 features including lag1-12, rolling averages, cyclical encoding, YoY growth
+  - SHAP feature importance (the 'explain it' demo moment for judges)
+  - CPU only, trains in ~30 sec. Saves `lgbm_demand_v1.pkl`
+
+**Script created:**
+- `data/scripts/09_load_nvbdcp.py` — NVBDCP annual data parser
+  - Parses Excel/CSV NVBDCP district reports (malaria + dengue ONLY — kala-azar/filariasis require ENUM changes)
+  - Temporal disaggregation: annual totals → 52 weekly estimates using seasonal multipliers from peer-reviewed sources (Dhiman RC et al. 2019 for malaria; NCDC India Weekly Bulletin 2012-2022 for dengue)
+  - Fuzzy district name matching (rapidfuzz when available, substring fallback)
+  - Conflict resolution: IDSP (epiclim) rows are NEVER overwritten; NVBDCP fills gaps only
+  - `--demo` flag for testing without real files
+  - Usage: `python data/scripts/09_load_nvbdcp.py --db-password PW --file data/raw/nvbdcp/malaria_2015_2023.xlsx`
+
+---
+
+## Notebook Inventory After Phase 1
+
+| Notebook | Model | Status | GPU? | Est. Train Time |
+|---|---|---|---|---|
+| 01_train_stgnn.ipynb | ST-GNN | Pending training | Yes | ~30 min |
+| 02_train_tft.ipynb | TFT | **Run now in Colab** | Yes | ~35 min |
+| 03_train_graphwavenet.ipynb | Graph WaveNet | Pending training | Yes | ~40 min |
+| 04_train_nbeats_ncd.ipynb | N-BEATS | Trained ✅ | Yes | Done |
+| 05_train_prophet.ipynb | Prophet | Ready to run | No (CPU) | ~5 min |
+| 06_train_anomaly_detector.ipynb | Isolation Forest | Ready to run | No (CPU) | ~2 min |
+| 07_train_lgbm_demand.ipynb | LightGBM | Ready to run | No (CPU) | ~5 min |
