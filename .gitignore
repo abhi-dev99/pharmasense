@@ -1,4 +1,6 @@
 .rocketride/
+.claude/
+.github/
 
 # ── Secrets ────────────────────────────────────────────
 .env
