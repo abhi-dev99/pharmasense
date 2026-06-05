@@ -6,6 +6,8 @@ import asyncio
 from backend.ml.loader import registry
 from backend.db.client import get_db
 from backend.cache.client import RedisClient
+from backend.kafka.consumers.runner import kafka_runner
+from backend.data.scheduler import start as start_scheduler, shutdown as shutdown_scheduler
 
 from backend.api.risk import risk_router
 from backend.api.forecast import forecast_router
@@ -38,10 +40,9 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         log.warning("startup.db.failed", error=str(e))
         
-    # In a full run we'd also start:
-    # grpc_server.start()
-    # scheduler.start()
-    # kafka_runner.start()
+    # Start background processes
+    kafka_runner.start()
+    start_scheduler()
     
     log.info("pharmasense.startup.complete", models=registry.health_map)
     
@@ -50,6 +51,8 @@ async def lifespan(app: FastAPI):
     # SHUTDOWN
     log.info("pharmasense.shutdown.begin")
     try:
+        await kafka_runner.stop()
+        shutdown_scheduler()
         await RedisClient.disconnect()
         get_db().disconnect()
     except:
