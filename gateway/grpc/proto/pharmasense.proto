@@ -1,0 +1,113 @@
+syntax = "proto3";
+package pharmasense.v1;
+option go_package = "gateway/grpc/gen;pharmasensepb";
+
+service PharmasenseML {
+  rpc GetDistrictRisk      (RiskRequest)         returns (RiskResponse);
+  rpc GetAllDistrictsRisk  (AllRiskRequest)      returns (AllRiskResponse);
+  rpc GetHospitalForecast  (ForecastRequest)     returns (ForecastResponse);
+  rpc GetHospitalBrief     (BriefRequest)        returns (BriefResponse);
+  rpc RunSimulation        (SimulationRequest)   returns (SimulationResponse);
+  rpc GetSignalTimeline    (TimelineRequest)     returns (TimelineResponse);
+  rpc TriggerBatch         (BatchTriggerReq)     returns (BatchStatusResponse);
+  rpc GetHealth            (HealthRequest)       returns (HealthResponse);
+}
+
+message RiskRequest {
+  string district_id = 1;
+  repeated string diseases = 2;  // empty = all 4
+  string date = 3;               // YYYY-MM-DD, empty = today
+}
+
+message RiskScore {
+  string disease       = 1;
+  double score         = 2;
+  string risk_level    = 3;   // HIGH / MEDIUM / LOW
+  int32  predicted_cases = 4;
+  int32  baseline_cases  = 5;   // Independent Prophet baseline
+  string model_used    = 6;
+  double weather_score = 7;
+  double search_score  = 8;
+  double epid_baseline = 9;
+  bool   is_anomaly    = 10;
+}
+
+message RiskResponse {
+  string district_id   = 1;
+  string district_name = 2;
+  string state         = 3;
+  repeated RiskScore scores = 4;
+  string computed_at   = 5;
+  bool   cache_hit     = 6;
+}
+
+message ForecastRequest {
+  string hospital_id    = 1;
+  int32  horizon_weeks  = 2;
+  optional double budget_inr = 3;
+}
+
+message DrugOrder {
+  string drug_id       = 1;
+  string drug_name     = 2;
+  double order_quantity = 3;
+  double order_cost_inr = 4;
+  double weeks_of_cover = 5;
+  string urgency        = 6;  // CRITICAL / HIGH / NORMAL / DEFER
+  string reason         = 7;
+}
+
+message ForecastResponse {
+  string hospital_id          = 1;
+  string optimization_status  = 2;
+  repeated DrugOrder orders   = 3;
+  double total_cost_inr       = 4;
+  repeated string drugs_at_risk = 5;
+}
+
+message BriefRequest  { string hospital_id = 1; }
+message BriefResponse { string brief_markdown = 1; bool cache_hit = 2; }
+
+message SimulationRequest {
+  repeated string district_ids = 1;
+  double intensity             = 2;  // 0.0 - 1.0
+  int32  duration_weeks        = 3;
+}
+
+message SimulationResponse {
+  map<string, double> baseline_scores  = 1;
+  map<string, double> simulated_scores = 2;
+  map<string, double> delta_scores     = 3;
+}
+
+message TimelineRequest  { string district_id = 1; int32 days = 2; }
+message TimelineResponse { repeated TimelinePoint points = 1; }
+message TimelinePoint    {
+  string date        = 1;
+  double rain_mm     = 2;
+  double humidity    = 3;
+  double temp_c      = 4;
+  int32  search_idx  = 5;
+  int32  epid_cases  = 6;
+  string disease     = 7;
+}
+
+message AllRiskRequest  {}
+message AllRiskResponse { repeated RiskResponse districts = 1; }
+
+message BatchTriggerReq { bool force = 1; }
+message BatchStatusResponse {
+  string last_run_at     = 1;
+  bool   success         = 2;
+  int32  districts_scored = 3;
+  string error_message   = 4;
+}
+
+message HealthRequest   {}
+message HealthResponse  {
+  bool   ok             = 1;
+  map<string, bool> models = 2;  // model_name -> is_loaded
+  bool   redis_ok       = 3;
+  bool   db_ok          = 4;
+  bool   kafka_ok       = 5;
+}

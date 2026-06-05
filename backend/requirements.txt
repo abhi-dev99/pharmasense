@@ -5,8 +5,8 @@ pydantic==2.6.1
 pydantic-settings==2.1.0
 
 # gRPC
-grpcio==1.62.0
-grpcio-tools==1.62.0
+grpcio>=1.62.0
+grpcio-tools>=1.62.0
 protobuf==4.25.3
 
 # DB & Cache
@@ -18,13 +18,13 @@ redis==5.0.1
 confluent-kafka==2.3.0
 
 # ML & Data
-numpy==1.26.4
-pandas==2.2.0
-scipy==1.12.0
-scikit-learn==1.4.0
-lightgbm==4.3.0
-prophet==1.1.5
-torch==2.2.0
+numpy>=1.26.4
+pandas>=2.2.0
+scipy>=1.12.0
+scikit-learn>=1.4.0
+lightgbm>=4.3.0
+prophet>=1.1.5
+torch>=2.2.0
 
 # Utils
 structlog==24.1.0
