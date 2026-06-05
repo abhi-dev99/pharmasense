@@ -1,6 +1,7 @@
 .rocketride/
 .claude/
 .github/
+_ragebaiters_worktree/
 
 # ── Secrets ────────────────────────────────────────────
 .env
