@@ -1,8 +1,10 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, AlertTriangle, PackageOpen, TrendingUp } from "lucide-react";
+import { RiskPanel } from "@/components/dashboard/RiskPanel";
+import { OrderTable } from "@/components/dashboard/OrderTable";
+import { AIBrief } from "@/components/dashboard/AIBrief";
 
 export default function OverviewPage() {
   return (
@@ -51,44 +53,15 @@ export default function OverviewPage() {
         </Card>
       </div>
 
-      {/* Middle Section */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Demand Forecast vs Actual Stock</CardTitle>
-            <CardDescription>Predicted consumption across critical SKUs</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center border-t border-dashed m-4 rounded-xl bg-muted/20">
-            {/* Chart will go here */}
-            <span className="text-muted-foreground text-sm">Interactive Chart Component Loading...</span>
-          </CardContent>
-        </Card>
-
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Immediate Action Required</CardTitle>
-            <CardDescription>AI has drafted these orders to prevent stockouts</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                { hospital: "Pune General", drug: "Paracetamol IV", risk: "critical", days: 3 },
-                { hospital: "Baramati PHC", drug: "Doxycycline", risk: "high", days: 5 },
-                { hospital: "Shirur Rural", drug: "ORS Sachets", risk: "moderate", days: 8 },
-              ].map((alert, i) => (
-                <div key={i} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">{alert.drug}</p>
-                    <p className="text-xs text-muted-foreground">{alert.hospital} • {alert.days} days cover left</p>
-                  </div>
-                  <Badge variant={alert.risk === "critical" ? "destructive" : "secondary"}>
-                    Approve PO
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Dynamic ML Integration Section */}
+      <div className="grid gap-6 md:grid-cols-3">
+        <div className="col-span-2 space-y-6">
+          <RiskPanel districtId="dist_pune_001" />
+          <OrderTable hospitalId="hosp_pune_general" />
+        </div>
+        <div className="col-span-1">
+          <AIBrief hospitalId="hosp_pune_general" />
+        </div>
       </div>
     </div>
   );
