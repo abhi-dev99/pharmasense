@@ -26,13 +26,11 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex flex-col w-60 h-screen fixed left-0 top-0 border-r border-border bg-sidebar">
-      <div className="p-6 flex items-center gap-3">
-        {/* Logo Placeholder */}
-        <div className="w-8 h-8 rounded bg-primary flex items-center justify-center">
-          <div className="w-3 h-3 rounded-full bg-white" />
-        </div>
-        <span className="font-semibold text-lg tracking-tight">Pharmasense</span>
+    <div className="flex flex-col w-60 h-screen fixed left-0 top-0 border-r border-gray-200 bg-white">
+      <div className="p-6 flex items-center">
+        <span className="font-bold text-2xl tracking-tighter text-[#404040] select-none" style={{ letterSpacing: "-0.05em" }}>
+          pharmasense
+        </span>
       </div>
 
       <div className="flex-1 px-4 py-2 space-y-1">
