@@ -2,7 +2,7 @@
 
 As a senior software engineer framing a hackathon strategy, you never walk through the front door if you can avoid it. Hackathons are won by **"The Wow Factor" (Oomph)**, **Execution Polish**, and **Narrative Framing**. Building a standard CRUD app for a crowded problem statement is a guaranteed way to lose in the screening round. 
 
-After reviewing the 2026 Problem Statements and doing a deep dive into your GitHub repositories (`supplite`, `health-guardian-app`, `argus`, `shushhh`), you have a **massive unfair advantage**. You already possess enterprise-grade ML pipelines, Flutter mobile roots, and quantum-safe concepts. 
+After reviewing the 2026 Problem Statements and doing a deep dive into your GitHub repositories (`AgTechathon`, `health-guardian-app`, `argus`, `shushhh`), you have a **massive unfair advantage**. You already possess enterprise-grade ML pipelines, Flutter mobile roots, and quantum-safe concepts. 
 
 Below is the definitive ranking of the Problem Statements, ordered from the ultimate winning strategies down to the absolute traps to avoid, complete with implementation plans tailored specifically for your existing codebases.
 
@@ -13,15 +13,15 @@ Below is the definitive ranking of the Problem Statements, ordered from the ulti
 
 ### 1. AGTech45-CE03-2: Freelancing Platform (Theme 3)
 * **The Pitch Angle**: "AI-Powered Gig Economy Demand Forecasting Dashboard" 
-* **Leverage Repo**: `supplite` (Pivot already planned in your workspace)
-* **Why You Will Win**: Every other team will build an "Upwork Clone" (MERN stack job board). It's incredibly boring. You, however, will walk in with a predictive intelligence platform. Using the `supplite` architecture, you predict freelance demand *before* it happens using Google Trends, real estate permits, and job velocity signals.
+* **Leverage Repo**: `AgTechathon` (Pivot already planned in your workspace)
+* **Why You Will Win**: Every other team will build an "Upwork Clone" (MERN stack job board). It's incredibly boring. You, however, will walk in with a predictive intelligence platform. Using the `AgTechathon` architecture, you predict freelance demand *before* it happens using Google Trends, real estate permits, and job velocity signals.
 * **Crowdedness**: High for the PS generally, **Zero** for your predictive angle.
 * **Tech Stack**:
   * **Frontend**: React.js / Deck.gl or Mapbox (for the 3D regional heatmaps).
   * **Backend**: Python (FastAPI/Flask).
   * **Data & ML**: Scikit-Learn/XGBoost for time-series demand forecasting, LLMs (OpenAI/Anthropic APIs) for generating "Worker Context Briefs".
 * **Implementation Plan**:
-  1. Fork/Clone the `supplite` repo and rename internal terms: "SKUs" -> "Job Categories", "Buyer Briefs" -> "Freelancer Briefs".
+  1. Fork/Clone the `AgTechathon` repo and rename internal terms: "SKUs" -> "Job Categories", "Buyer Briefs" -> "Freelancer Briefs".
   2. Implement a quick data scraping script (or use synthetic data) mimicking Upwork APIs / Google search trends for "freelance designers," "electricians," etc.
   3. Deploy the UI to Vercel/Netlify, ensuring the 3D map highlights high-demand zones for gig workers.
   4. Your PPT focuses heavily on *Income Stability* out of the gig economy.
@@ -43,15 +43,15 @@ Below is the definitive ranking of the Problem Statements, ordered from the ulti
 
 ### 3. AGTech45-CE01-2: Drug Inventory and supply chain Tracking system
 * **The Pitch Angle**: "Predictive Pharmaceutical Supply Chain with Epidemiological Signals"
-* **Leverage Repo**: `supplite`
-* **Why You Will Win**: Once again, standard entries will just be CRUD inventory systems. You can adapt `supplite` to monitor and forecast drug shortages by fusing external geographical disease trends (e.g., Google searches for "flu medicine") and real-time stock levels.
+* **Leverage Repo**: `AgTechathon`
+* **Why You Will Win**: Once again, standard entries will just be CRUD inventory systems. You can adapt `AgTechathon` to monitor and forecast drug shortages by fusing external geographical disease trends (e.g., Google searches for "flu medicine") and real-time stock levels.
 * **Crowdedness**: Very Low.
 * **Tech Stack**:
   * **Frontend**: React.js / Node.js
   * **Backend**: Python (Pandas + Geopandas).
   * **Analytics**: Automated LLM reports that alert hospital admins to order stock *before* the outbreak hits.
 * **Implementation Plan**:
-  1. Keep the `supplite` backend but replace housing/furniture synthetic CSVs with medical synthetic data (Paracetamol, Amoxicillin stock).
+  1. Keep the `AgTechathon` backend but replace housing/furniture synthetic CSVs with medical synthetic data (Paracetamol, Amoxicillin stock).
   2. Map the 3D interface to specific hospitals or state regions instead of warehouses.
   3. PPT Focus: Preventing another COVID-19/supply crisis scenario automatically.
 
@@ -104,7 +104,7 @@ Below is the definitive ranking of the Problem Statements, ordered from the ulti
 ---
 
 ### 🔥 Executive Recommendation Summary
-If I were to mentor your team, I would tell you to **pivot `supplite` into the Freelancing Platform (Rank #1)** or **brand `health-guardian-app` into HDIMS (Rank #2)**. 
+If I were to mentor your team, I would tell you to **pivot `AgTechathon` into the Freelancing Platform (Rank #1)** or **brand `health-guardian-app` into HDIMS (Rank #2)**. 
 
 Both strategies leverage your existing 80% completed, high-quality codebases. This frees up your 24 hours to focus entirely on pitch polish, seamless PowerPoint design, synthetic data generation, and UI animations—which is exactly how screening rounds and physical hackathons are actually won. 
 

@@ -1,12 +1,12 @@
-# Supplite-Med: Predictive Epidemiological Supply Chain (AGTech45-CE01-2)
+# AgTechathon-Med: Predictive Epidemiological Supply Chain (AGTech45-CE01-2)
 ## Complete Requirements Analysis & Market Landscape
 
-This document scopes out the exact requirements needed to adapt your existing `supplite` architecture into an **unbeatable** predictive drug inventory system for the 24-hour hackatAGTech45-CE01-2hon. 
+This document scopes out the exact requirements needed to adapt your existing `AgTechathon` architecture into an **unbeatable** predictive drug inventory system for the 24-hour hackathon. 
 
 ---
 
 ## 1. Executive Summary
-Standard drug inventory systems track what has already been sold. **Supplite-Med** predicts what *will be needed* before the demand exists. By correlating external environmental stress markers (weather, search trends, local news) with existing hospital inventory, the system models the geographical spread of diseases (e.g., Dengue, Malaria, viral flu) and automatically generates preemptive restock orders. 
+Standard drug inventory systems track what has already been sold. **AgTechathon-Med** predicts what *will be needed* before the demand exists. By correlating external environmental stress markers (weather, search trends, local news) with existing hospital inventory, the system models the geographical spread of diseases (e.g., Dengue, Malaria, viral flu) and automatically generates preemptive restock orders. 
 
 * **The Vision**: Prevent medical supply chain collapse in Tier-2 and rural sectors by acting proactively rather than reactively.
 * **The "Hackathon Wow Factor"**: A glowing 3D Mapbox/Deck.gl visualization plotting disease risk heatmaps overlapping with pharmacy inventory statuses, accompanied by AI-generated "Restock Briefing" documents.
@@ -25,7 +25,7 @@ We must know the market to prove to the judges that this isn't just a toy, but a
 | **Palantir Foundry (Health)**| Ultimate big-data routing used by NHS and CDC. | Multi-million dollar barrier to entry. Over-engineered for local clinics. |
 
 **Your Unique Selling Proposition (USP)**:
-Competitors need 5 years of clean SQL data to predict trends. Your system uses **Public Alternative Data** (Weather APIs + Search Trends) via your existing `supplite` signal-fusion engine, making it deployable instantly for regions with zero historical medical records.
+Competitors need 5 years of clean SQL data to predict trends. Your system uses **Public Alternative Data** (Weather APIs + Search Trends) via your existing `AgTechathon` signal-fusion engine, making it deployable instantly for regions with zero historical medical records.
 
 ---
 
@@ -54,9 +54,9 @@ What the prototype *must* do during the 24-hour hackathon to secure the win:
 
 ---
 
-## 5. Technical Stack (Leveraging `supplite` repo)
+## 5. Technical Stack (Leveraging `AgTechathon` repo)
 
-* **Frontend**: React.js + Deck.GL / Mapbox GL JS *(You already matched this in `supplite`)*. TailwindCSS for futuristic styling.
+* **Frontend**: React.js + Deck.GL / Mapbox GL JS *(You already matched this in `AgTechathon`)*. TailwindCSS for futuristic styling.
 * **Backend**: Python FastAPI. It is lightweight, async, and handles your data tasks quickly.
 * **Data Processing**: Pandas / Geopandas for aligning zip codes/districts. 
 * **AI/Intelligence**: 
@@ -68,7 +68,7 @@ What the prototype *must* do during the 24-hour hackathon to secure the win:
 
 ## 6. The 24-Hour Hackathon Execution Roadmap (Do or Die)
 
-* **Hour 0-2 (Setup & Scripts)**: Clone `supplite`. Strip all references to "Retail/Williams-Sonoma". Rename variables to `pharmacy_id`, `drug_sku`, `vulnerability_score`.
+* **Hour 0-2 (Setup & Scripts)**: Clone `AgTechathon`. Strip all references to "Retail/Williams-Sonoma". Rename variables to `pharmacy_id`, `drug_sku`, `vulnerability_score`.
 * **Hour 2-6 (Synthetic Data)**: Write a quick Python script to generate 3 CSVs: `pharmacies.csv` (lat/long points), `inventory.csv` (stock levels), `weather_trends.csv` (mocked anomaly markers).
 * **Hour 6-12 (Backend Logic)**: Modify your signal fusion code. If `weather_score` > `0.8` AND `inventory_stock` < `100`, then `status` = `"CRITICAL"`. Export to an API endpoint.
 * **Hour 12-18 (Frontend Polish)**: Connect the Map UI to the new API. Ensure the Mapbox pins reflect the danger status. Code the "Generate AI Report" button.

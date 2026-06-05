@@ -50,9 +50,6 @@ mlruns/
 .DS_Store
 Thumbs.db
 
-# ── Excluded folders ───────────────────────────────────
-supplite/
-
 # ── Sensitive seed data ─────────────────────────────────
 data/seed/demo_accounts.json
 data/processed/

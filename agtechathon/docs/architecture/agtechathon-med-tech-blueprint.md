@@ -1,4 +1,4 @@
-﻿# AgTechathon: Supplite-Med Production Blueprint & Architecture
+﻿# AgTechathon: Med Production Blueprint & Architecture
 We are abandoning the "we only have 24 hours" crutch. To win—and to build a genuine, marketable product—we are treating this as an enterprise-grade startup launch. The architecture below is expansive, commercially viable, and built for scale.
 
 This blueprint establishes the **Unique Selling Proposition (USP)**, the **India-compliant data strategy**, an **upgraded cloud-native tech stack**, and the **production deployment pipeline**.
@@ -31,7 +31,7 @@ You cannot pitch this in India without proving it works for the Indian demograph
 ---
 
 ## 3. Tech Stack Lock-Down (The Startup Fleet)
-We are upgrading from the basic supplite stack to a modern, scalable cloud infrastructure.
+We are upgrading from the basic starter stack to a modern, scalable cloud infrastructure.
 
 | Domain | Selected Technology | Reasoning & Scale Factor |
 | :--- | :--- | :--- |
@@ -53,8 +53,8 @@ uff, lake8) and unit tests on every pull request. Having a slide titled "Automa
 
 ---
 
-## 5. supplite Codebase Evolution (The Upgrade Path)
-To support this expansive vision, we must modify the existing supplite repository heavily:
+## 5. AgTechathon Codebase Evolution (The Upgrade Path)
+To support this expansive vision, we must modify the existing AgTechathon repository heavily:
 
 1. **Rip Out \demo_data.py\ completely**: Replace it with the supabase-py client. Every backend lookup must be a real SQL query to our Supabase instance fetching actual seeded inventory data for Indian hospitals.
 2. **MLOps Real-Time Integration**: We completely abandon the static CSV Random Forest approach in `train_real_estate_model.py`. We will implement a custom PyTorch Geometric (PyG) network. We will serialize the PyTorch model (`.pt` or `.onnx`) and load it directly into FastAPI's memory on startup (`@app.on_event("startup")`). When the React frontend sends a live weather anomaly trigger, the backend updates the node features mathematically and propagates the risk score across the spatial graph in real-time.

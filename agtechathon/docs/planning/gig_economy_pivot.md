@@ -1,7 +1,7 @@
-# Supplite → Gig Economy Pivot
+# AgTechathon → Gig Economy Pivot
 
 ## Current Project Foundation
-- **Name**: Supplite (Demand Intelligence System)
+- **Name**: AgTechathon (Demand Intelligence System)
 - **Original Domain**: WSI (Williams-Sonoma) inventory forecasting
 - **Core Innovation**: Fuses 3 signals (sales history + Google Trends virality + US Census housing permits)
 - **Output**: LLM-powered "buyer briefs" with action recommendations
@@ -35,7 +35,7 @@
 - Predict demand across multiple service categories simultaneously
 - Help workers make portfolio decisions (which services to offer, when)
 
-## Reusable Assets from Supplite
+## Reusable Assets from AgTechathon
 ✅ Geospatial mapping (territories → regions/cities)
 ✅ Signal fusion architecture (can adapt to any 3+ signal set)
 ✅ LLM briefing generation pipeline

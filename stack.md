@@ -143,7 +143,7 @@ Enforced via Supabase Row Level Security — a pharmacist SQL query physically c
 | Tool | Purpose |
 |---|---|
 | Next.js 14 (App Router) | SSR, streaming, API routes |
-| deck.gl + react-map-gl | 3D district heatmap (LIFTED from Supplite) |
+| deck.gl + react-map-gl | 3D district heatmap (LIFTED from AgTechathon) |
 | Recharts | Signal timelines |
 | Tailwind CSS | Styling |
 | Clerk OR Supabase Auth JS | Auth (same JWT, same RLS) |
@@ -550,7 +550,7 @@ Phase 6 — Integration & Polish
 
 Phase 7 — Next.js Frontend (after backend is THRIVING)
   [ ] Scaffold Next.js 14 App Router
-  [ ] Lift deck.gl map from Supplite
+  [ ] Lift deck.gl map from AgTechathon
   [ ] Build all views as React components
   [ ] Same Go gateway API, zero backend changes
   [ ] Deploy to Vercel
@@ -579,3 +579,4 @@ Phase 7 — Next.js Frontend (after backend is THRIVING)
 
 *Last updated: 2026-06-03*
 *Stack version: 1.0 — locked for AgTechathon 2.0 2K26 build*
+

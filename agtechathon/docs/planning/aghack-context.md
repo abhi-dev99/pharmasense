@@ -5,12 +5,12 @@ This document captures the entire end-to-end strategic planning, pivots, choices
 ---
 
 ## 1. Initial Prompt & Problem Statement Evaluation
-**Goal:** Evaluate the given problem statements for AgTechathon 2.0 2K26 (Screening round to 24hr final). Find the best choice with high "Wow Factor" (Oomph), low crowdedness, and the ability to leverage existing repositories (`supplite`, `health-guardian-app`, `argus`, `shushhh`) to gain an unfair advantage.
+**Goal:** Evaluate the given problem statements for AgTechathon 2.0 2K26 (Screening round to 24hr final). Find the best choice with high "Wow Factor" (Oomph), low crowdedness, and the ability to leverage existing repositories (`AgTechathon`, `health-guardian-app`, `argus`, `shushhh`) to gain an unfair advantage.
 
 ### **The "Unfair Advantage" Rankings (Leveraging Existing Code)**
-1. **Freelancing Platform (Theme 3)** -> Pivot `supplite` to a gig-economy predictive dashboard.
+1. **Freelancing Platform (Theme 3)** -> Pivot `AgTechathon` to a gig-economy predictive dashboard.
 2. **Health Data Information System (Theme 1)** -> Pivot `health-guardian-app` to a rural-first, voice-accessible EMR.
-3. **Drug Inventory Tracking (Theme 1)** -> Pivot `supplite` to a predictive epidemiological supply chain.
+3. **Drug Inventory Tracking (Theme 1)** -> Pivot `AgTechathon` to a predictive epidemiological supply chain.
 4. **Open Innovation (Theme 6)** -> Use `argus` (Fraud Detection/Deepfake engine) or `shushhh` (Quantum-Safe Comms) to overwhelm judges with enterprise tech.
 5. **Public Health Chatbot (Theme 2)** -> Saturated, but viable with Flutter/Voice inputs.
 
@@ -27,7 +27,7 @@ This document captures the entire end-to-end strategic planning, pivots, choices
 ---
 
 ## 3. The "Brutal Truth" Final Decision
-**Selected Pitch: Drug Inventory and Supply Chain Tracking System (AGTech45-CE01-2) -> Rebranded as "Supplite-Med"**
+**Selected Pitch: Drug Inventory and Supply Chain Tracking System (AGTech45-CE01-2) -> Rebranded as "AgTechathon-Med"**
 *   **The Concept:** A "Predictive Epidemiological Supply Chain." Instead of a reactive SQL database complaining about empty shelves, we build an intelligent engine that cross-references weather data and symptom-search trends to predict outbreaks (Dengue, Malaria) and pre-emptively generates restocking orders 14 days before a crisis.
 *   **The Narrative:** "Preventing medical supply chain collapses in rural grids using alternative data."
 
@@ -42,7 +42,7 @@ This document captures the entire end-to-end strategic planning, pivots, choices
 ## 5. First-Pass "24-Hour" Architecture (The Setup)
 Initially, we planned for speed:
 *   **Data:** Google Trends via `pytrends`, OpenWeatherMap API, Python `Faker` for mock hospital inventory.
-*   **Code Audit Findings (supplite):**
+*   **Code Audit Findings (AgTechathon):**
     *   *Red Flag 1:* ML was offline (generated static CSVs). Needed integration into FastAPI as a `/predict` endpoint.
     *   *Red Flag 2:* Hardcoded real-estate demo data.
     *   *Red Flag 3:* LLM prompts locked to real-estate "buyer briefs."
@@ -82,7 +82,7 @@ Initially, we planned for speed:
 ---
 
 ## Conclusion
-Every detail is locked. The narrative is unassailable. The stack is enterprise-ready. The model uses cutting-edge graph mathematics. Supplite-Med is ready to be built.
+Every detail is locked. The narrative is unassailable. The stack is enterprise-ready. The model uses cutting-edge graph mathematics. AgTechathon-Med is ready to be built.
 
 
 
@@ -95,12 +95,12 @@ This document captures the entire end-to-end strategic planning, pivots, choices
 ---
 
 ## 1. Initial Prompt & Problem Statement Evaluation
-**Goal:** Evaluate the given problem statements for AgTechathon 2.0 2K26 (Screening round to 24hr final). Find the best choice with high "Wow Factor" (Oomph), low crowdedness, and the ability to leverage existing repositories (`supplite`, `health-guardian-app`, `argus`, `shushhh`) to gain an unfair advantage.
+**Goal:** Evaluate the given problem statements for AgTechathon 2.0 2K26 (Screening round to 24hr final). Find the best choice with high "Wow Factor" (Oomph), low crowdedness, and the ability to leverage existing repositories (`AgTechathon`, `health-guardian-app`, `argus`, `shushhh`) to gain an unfair advantage.
 
 ### **The "Unfair Advantage" Rankings (Leveraging Existing Code)**
-1. **Freelancing Platform (Theme 3)** -> Pivot `supplite` to a gig-economy predictive dashboard.
+1. **Freelancing Platform (Theme 3)** -> Pivot `AgTechathon` to a gig-economy predictive dashboard.
 2. **Health Data Information System (Theme 1)** -> Pivot `health-guardian-app` to a rural-first, voice-accessible EMR.
-3. **Drug Inventory Tracking (Theme 1)** -> Pivot `supplite` to a predictive epidemiological supply chain.
+3. **Drug Inventory Tracking (Theme 1)** -> Pivot `AgTechathon` to a predictive epidemiological supply chain.
 4. **Open Innovation (Theme 6)** -> Use `argus` (Fraud Detection/Deepfake engine) or `shushhh` (Quantum-Safe Comms) to overwhelm judges with enterprise tech.
 5. **Public Health Chatbot (Theme 2)** -> Saturated, but viable with Flutter/Voice inputs.
 
@@ -117,7 +117,7 @@ This document captures the entire end-to-end strategic planning, pivots, choices
 ---
 
 ## 3. The "Brutal Truth" Final Decision
-**Selected Pitch: Drug Inventory and Supply Chain Tracking System (AGTech45-CE01-2) -> Rebranded as "Supplite-Med"**
+**Selected Pitch: Drug Inventory and Supply Chain Tracking System (AGTech45-CE01-2) -> Rebranded as "AgTechathon-Med"**
 *   **The Concept:** A "Predictive Epidemiological Supply Chain." Instead of a reactive SQL database complaining about empty shelves, we build an intelligent engine that cross-references weather data and symptom-search trends to predict outbreaks (Dengue, Malaria) and pre-emptively generates restocking orders 14 days before a crisis.
 *   **The Narrative:** "Preventing medical supply chain collapses in rural grids using alternative data."
 
@@ -132,7 +132,7 @@ This document captures the entire end-to-end strategic planning, pivots, choices
 ## 5. First-Pass "24-Hour" Architecture (The Setup)
 Initially, we planned for speed:
 *   **Data:** Google Trends via `pytrends`, OpenWeatherMap API, Python `Faker` for mock hospital inventory.
-*   **Code Audit Findings (supplite):**
+*   **Code Audit Findings (AgTechathon):**
     *   *Red Flag 1:* ML was offline (generated static CSVs). Needed integration into FastAPI as a `/predict` endpoint.
     *   *Red Flag 2:* Hardcoded real-estate demo data.
     *   *Red Flag 3:* LLM prompts locked to real-estate "buyer briefs."
@@ -172,7 +172,7 @@ Initially, we planned for speed:
 ---
 
 ## Conclusion
-Every detail is locked. The narrative is unassailable. The stack is enterprise-ready. The model uses cutting-edge graph mathematics. Supplite-Med is ready to be built.
+Every detail is locked. The narrative is unassailable. The stack is enterprise-ready. The model uses cutting-edge graph mathematics. AgTechathon-Med is ready to be built.
 
 ---
 
@@ -227,11 +227,11 @@ This section is a chronological, detailed capture of the entire chat-based colla
 - Files created in user's Downloads and moved into `agtechathon`:
     - Scraping scripts listed above.
     - `pharmasense_ppt_content.md` containing the finalized slide content.
-    - Existing project notes (`supplite_hackathon_pivot.md`) moved into project.
+    - Existing project notes (`AgTechathon_hackathon_pivot.md`) moved into project.
 - Repository reorganization steps executed locally (folders created):
     - `scripts/` — contains Python scraping/utility scripts.
     - `docs/pitch/` — contains `pharmasense_ppt_content.md`.
-    - `docs/architecture/` — contains `supplite-med-*.md` (technical blueprints and requirements).
+    - `docs/architecture/` — contains `AgTechathon-med-*.md` (technical blueprints and requirements).
     - `docs/planning/` — contains `aghack-*.md` conversation logs and pivot docs.
 
 ### E. Presentation Content and Visual Design
@@ -320,7 +320,7 @@ This section is a chronological, detailed capture of the entire chat-based colla
 2. Download the two anchor datasets into `data/raw/`:
      - `EpiClim` (Zenodo)
      - `India Medicines Catalog` (Kaggle)
-3. Implement the deterministic translation JSON (ICMR mapping) and create a small script to generate `supplite_hospital_transactions_baseline.csv` from EpiClim + translation rules.
+3. Implement the deterministic translation JSON (ICMR mapping) and create a small script to generate `AgTechathon_hospital_transactions_baseline.csv` from EpiClim + translation rules.
 4. Train a small TFT baseline model on the synthetic data; deploy as a FastAPI endpoint for the demo.
 5. Prepare the Unstop PPT PDF using the slide copy in `docs/pitch/pharmasense_ppt_content.md` and the minimalistic assets generated by prompts.
 

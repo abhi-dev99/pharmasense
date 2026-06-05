@@ -1560,7 +1560,7 @@ Same as `.env`. Set via Render dashboard → Environment section. Never committe
 
 # Phase 7 — Next.js Frontend (After Backend THRIVING)
 
-**Goal:** Production-grade UI. Same Go gateway API. Lift Supplite assets.
+**Goal:** Production-grade UI. Same Go gateway API. Lift AgTechathon assets.
 
 **Timeline estimate:** 2 days (after Phase 6 is stable)
 
@@ -1573,7 +1573,7 @@ Same as `.env`. Set via Render dashboard → Environment section. Never committe
 
 ```
 Next.js 14 (App Router)
-deck.gl + react-map-gl    → 3D district heatmap (LIFTED from Supplite)
+deck.gl + react-map-gl    → 3D district heatmap (LIFTED from AgTechathon)
 Recharts                  → signal timelines
 Tailwind CSS              → styling
 Supabase Auth JS          → client-side auth (same JWT as backend)
@@ -1581,10 +1581,10 @@ SWR                       → data fetching + stale-while-revalidate
 Clerk (optional)          → if Supabase Auth JS lacks UI polish
 ```
 
-## Assets to Lift from Supplite
+## Assets to Lift from AgTechathon
 
 ```
-Supplite source: d:\hackathob\pharmasense\supplite\
+AgTechathon source: d:\hackathob\pharmasense\AgTechathon\
 Assets to take:
   - The SciFiMap / deck.gl setup (3D heatmap component)
   - index.css design tokens (color palette, typography)
@@ -1593,7 +1593,7 @@ Assets to take:
 
 What NOT to take:
   - Any supply chain / WSI / retail logic
-  - Auth system (Supplite's auth is different)
+  - Auth system (AgTechathon's auth is different)
   - Data models
 ```
 
@@ -1654,3 +1654,4 @@ What NOT to take:
 
 *Last updated: 2026-06-03*
 *Phase version: 1.0 — locked for AgTechathon 2.0 2K26*
+
