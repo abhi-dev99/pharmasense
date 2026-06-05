@@ -3,7 +3,7 @@ from datetime import date
 from typing import List, Optional
 import structlog
 from backend.cache.decorators import cache_response
-from backend.cache.keys import RedisKeys
+from backend.cache.keys import CacheKeys
 from backend.schemas import RiskResponse, RiskScore
 from backend.ml.loader import registry
 from backend.ml.router import route, InferenceStrategy
@@ -13,7 +13,7 @@ log = structlog.get_logger()
 risk_router = APIRouter(prefix="/risk", tags=["risk"])
 
 @risk_router.get("/district/{district_id}", response_model=RiskResponse)
-# @cache_response(key_func=RedisKeys.risk_score, ttl_seconds=86400) # In real implementation we'd wrap this
+# @cache_response(key_func=CacheKeys.risk_score, ttl_seconds=86400) # In real implementation we'd wrap this
 async def get_district_risk(
     district_id: str, 
     diseases: str = "dengue,malaria,type2_diabetes", 

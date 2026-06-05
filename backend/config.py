@@ -1,25 +1,26 @@
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file='../.env', extra='ignore')
+    model_config = SettingsConfigDict(env_file=os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'), extra='ignore')
     
     # Supabase
-    supabase_url_a: str
-    supabase_service_role_key_a: str
-    supabase_db_url_a: str
+    supabase_url_a: str = ''
+    supabase_service_role_key_a: str = ''
+    supabase_db_url_a: str = ''
     
-    supabase_url_b: str
-    supabase_service_role_key_b: str
+    supabase_url_b: str = ''
+    supabase_service_role_key_b: str = ''
     
     # Redis
-    redis_url: str
+    redis_url: str = 'redis://localhost:6379'
     redis_max_connections: int = 20
     
     # Kafka
-    kafka_bootstrap_servers: str
-    kafka_api_key: Optional[str] = None
-    kafka_api_secret: Optional[str] = None
+    kafka_bootstrap_servers: str = 'localhost:9092'
+    kafka_api_key: Optional[str] = ''
+    kafka_api_secret: Optional[str] = ''
     kafka_outbreak_topic: str = 'outbreak_events'
     kafka_consumer_group_po: str = 'pharmasense-po-generator'
     kafka_consumer_group_wa: str = 'pharmasense-whatsapp-notifier'
@@ -37,7 +38,6 @@ class Settings(BaseSettings):
     disease_drug_map_path: str = 'data/seed/disease_drug_map.csv'
     
     # External APIs
-    google_gemini_api_key: str
     openweather_api_key: str
     twilio_account_sid: str
     twilio_auth_token: str
