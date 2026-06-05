@@ -31,3 +31,4 @@ structlog==24.1.0
 APScheduler==3.10.4
 pytrends==4.9.2
 requests==2.31.0
+apscheduler>=3.10.4
