@@ -10,19 +10,20 @@ from backend.main import app
 client = TestClient(app)
 
 def run_tests():
-    print("Testing /health ...")
-    response = client.get("/health")
-    assert response.status_code == 200
-    print("Health check OK:", response.json())
+    with TestClient(app) as client:
+        print("Testing /health ...")
+        response = client.get("/health")
+        assert response.status_code == 200
+        print("Health check OK:", response.json())
 
-    print("Testing /api/v1/risk/district/test_district ...")
-    response = client.get("/api/v1/risk/district/test_district?diseases=dengue,malaria")
-    # Will be 404 because get_district_by_id checks db, but let's see if it hits the code
-    # We can mock get_district_by_id in a real test
-    print("Risk check returned:", response.status_code, response.json())
+        print("Testing /api/v1/risk/district/test_district ...")
+        response = client.get("/api/v1/risk/district/test_district?diseases=dengue,malaria,hypertension")
+        # Will be 404 because get_district_by_id checks db, but let's see if it hits the code
+        # We can mock get_district_by_id in a real test
+        print("Risk check returned:", response.status_code, response.json())
 
-    print("Testing /api/v1/simulate/monsoon ...")
-    response = client.post(
+        print("Testing /api/v1/simulate/monsoon ...")
+        response = client.post(
         "/api/v1/simulate/monsoon",
         json={"district_ids": ["d1", "d2"], "intensity": 0.8, "duration_weeks": 4}
     )
