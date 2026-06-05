@@ -254,7 +254,8 @@ def save_adjacency_for_ml(gdf: gpd.GeoDataFrame, adjacency: dict):
         "id_to_index": index,
         "index_to_id": {str(v): k for k, v in index.items()},
         "n_districts": len(ids),
-        "edges": edges,
+        "edges": [[r, c] for r, c in zip(edges["rows"], edges["cols"])],
+        "nodes": [{"id": row.get("canonical_id", row["census_code"]), "name": row["district_name"], "state": row["state_name"]} for _, row in gdf.iterrows()],
         "metadata": {
             "source": "datameet/maps",
             "created": pd.Timestamp.now().isoformat(),
