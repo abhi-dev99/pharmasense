@@ -46,26 +46,82 @@ class ModelRegistry:
             log.warning("ml.registry.stgnn.missing", error=str(e))
 
     def _load_graphwavenet(self):
-        self._ready['graphwavenet'] = False
+        try:
+            from backend.ml.graphwavenet import load_gwn_artifact
+            artifact = load_gwn_artifact()
+            if artifact is not None:
+                self._models['graphwavenet'] = {"type": "graphwavenet", "status": "loaded"}
+                self._ready['graphwavenet'] = True
+            else:
+                self._ready['graphwavenet'] = False
+        except Exception as e:
+            self._ready['graphwavenet'] = False
+            log.warning("ml.registry.graphwavenet.missing", error=str(e))
 
     def _load_tft(self):
-        self._ready['tft'] = False
+        try:
+            from backend.ml.tft import load_tft_artifact
+            artifact = load_tft_artifact()
+            if artifact is not None:
+                self._models['tft'] = {"type": "tft", "status": "loaded"}
+                self._ready['tft'] = True
+            else:
+                self._ready['tft'] = False
+        except Exception as e:
+            self._ready['tft'] = False
+            log.warning("ml.registry.tft.missing", error=str(e))
 
     def _load_nbeats(self):
-        self._ready['nbeats'] = False
+        try:
+            from backend.ml.nbeats import load_nbeats_artifact
+            artifact = load_nbeats_artifact()
+            if artifact is not None:
+                self._models['nbeats'] = {"type": "nbeats", "status": "loaded"}
+                self._ready['nbeats'] = True
+            else:
+                self._ready['nbeats'] = False
+        except Exception as e:
+            self._ready['nbeats'] = False
+            log.warning("ml.registry.nbeats.missing", error=str(e))
 
     def _load_prophet(self):
         try:
-            self._models['prophet'] = {"type": "prophet", "status": "loaded"}
-            self._ready['prophet'] = True
+            from backend.ml.prophet import load_prophet_artifact
+            artifact = load_prophet_artifact()
+            if artifact is not None:
+                self._models['prophet'] = {"type": "prophet", "status": "loaded"}
+                self._ready['prophet'] = True
+            else:
+                self._ready['prophet'] = False
         except Exception as e:
             self._ready['prophet'] = False
+            log.warning("ml.registry.prophet.missing", error=str(e))
 
     def _load_anomaly(self):
-        self._ready['anomaly'] = True
+        try:
+            from backend.ml.anomaly import load_anomaly_artifact
+            artifact = load_anomaly_artifact()
+            if artifact is not None:
+                self._models['anomaly'] = {"type": "anomaly", "status": "loaded"}
+                self._ready['anomaly'] = True
+            else:
+                self._ready['anomaly'] = False
+        except Exception as e:
+            self._ready['anomaly'] = False
+            log.warning("ml.registry.anomaly.missing", error=str(e))
         
     def _load_lgbm(self):
-        self._ready['lgbm'] = True
+        try:
+            from backend.ml.lgbm import load_lgbm_artifact
+            artifact = load_lgbm_artifact()
+            if artifact is not None:
+                self._models['lgbm'] = {"type": "lgbm", "status": "loaded"}
+                self._ready['lgbm'] = True
+            else:
+                self._ready['lgbm'] = False
+        except Exception as e:
+            self._ready['lgbm'] = False
+            log.warning("ml.registry.lgbm.missing", error=str(e))
 
     def is_ready(self, name: str) -> bool:
         return self._ready.get(name, False)
