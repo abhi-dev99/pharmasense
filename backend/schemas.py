@@ -44,3 +44,18 @@ class ForecastResponse(BaseModel):
 class BriefResponse(BaseModel):
     brief_markdown: str
     cache_hit: bool
+
+# ── Long Term Prophet Models ──
+class MonthlyForecast(BaseModel):
+    month: str
+    predicted_demand: int
+    lower_bound: int
+    upper_bound: int
+
+class LongTermForecastResponse(BaseModel):
+    district_id: str
+    disease: str
+    months_ahead: int
+    total_projected_cases: int
+    peak_month: str
+    forecast_timeline: List[MonthlyForecast]

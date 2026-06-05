@@ -28,8 +28,17 @@ def run_tests():
         json={"district_ids": ["d1", "d2"], "intensity": 0.8, "duration_weeks": 4}
     )
     assert response.status_code == 200
-    print("Simulate OK:", response.json())
-    
+    sim_resp = response.json()
+    print(f"Simulate OK: {sim_resp}")
+
+    print("Testing /api/v1/forecast/long-term/test_district?disease=dengue&months_ahead=6 ...")
+    response = client.get("/api/v1/forecast/long-term/test_district", params={"disease": "dengue", "months_ahead": 6})
+    if response.status_code != 200:
+        print(f"Forecast Error: {response.status_code} {response.text}")
+    else:
+        fc_resp = response.json()
+        print(f"Forecast OK, peak month: {fc_resp['peak_month']}, timeline length: {len(fc_resp['forecast_timeline'])}")
+
     print("All tests passed structurally.")
 
 if __name__ == "__main__":

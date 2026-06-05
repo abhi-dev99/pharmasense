@@ -7,8 +7,8 @@ NCD = {'hypertension', 'type2_diabetes', 'tuberculosis', 'anaemia',
        'uti_bacterial_infections', 'maternal_anc_supplements'}
 
 class InferenceStrategy(Enum):
-    SPATIAL_ENSEMBLE  = 'spatial'    # ST-GNN + GWN + Prophet → communicable
-    DEMAND_ENSEMBLE   = 'demand'     # TFT + N-BEATS + Prophet → NCD
+    SPATIAL_ENSEMBLE  = 'spatial'    # ST-GNN + GWN → communicable
+    DEMAND_ENSEMBLE   = 'demand'     # TFT + N-BEATS → NCD
     ANOMALY_ONLY      = 'anomaly'    # supplement to spatial
 
 def route(disease: str, registry) -> InferenceStrategy:

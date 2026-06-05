@@ -45,11 +45,9 @@ async def get_district_risk(
         
         if strategy == InferenceStrategy.SPATIAL_ENSEMBLE:
             inf_res = infer_stgnn(district_id, d, target_date)
-            # Incorporate GWN and Prophet as ensemble partners
+            # Incorporate GWN as an ensemble partner
             from backend.ml.graphwavenet import infer_graphwavenet
-            from backend.ml.prophet import infer_prophet
             gwn_res = infer_graphwavenet(district_id, d, target_date)
-            prophet_res = infer_prophet(district_id, d, target_date)
             
             valid_cases = []
             valid_scores = []
@@ -59,24 +57,19 @@ async def get_district_risk(
             if "error" not in gwn_res:
                 valid_cases.append(gwn_res["predicted_cases"])
                 valid_scores.append(gwn_res["risk_score"])
-            if "error" not in prophet_res:
-                valid_cases.append(prophet_res["predicted_cases"])
-                valid_scores.append(prophet_res["risk_score"])
                 
             if valid_cases:
                 predicted_cases = int(sum(valid_cases) / len(valid_cases))
                 risk_score_val = sum(valid_scores) / len(valid_scores)
-                model_used = "spatial_ensemble (stgnn+gwn+prophet)"
+                model_used = "spatial_ensemble (stgnn+gwn)"
             else:
                 log.warning("ml.inference.failed", disease=d, error="All spatial models failed")
                 
         elif strategy == InferenceStrategy.DEMAND_ENSEMBLE:
             from backend.ml.tft import infer_tft
             from backend.ml.nbeats import infer_nbeats
-            from backend.ml.prophet import infer_prophet
             inf_res = infer_tft(district_id, d, target_date)
             nb_res = infer_nbeats(district_id, d, target_date)
-            prophet_res = infer_prophet(district_id, d, target_date)
             
             valid_cases = []
             valid_scores = []
@@ -86,14 +79,11 @@ async def get_district_risk(
             if "error" not in nb_res:
                 valid_cases.append(nb_res["predicted_cases"])
                 valid_scores.append(nb_res["risk_score"])
-            if "error" not in prophet_res:
-                valid_cases.append(prophet_res["predicted_cases"])
-                valid_scores.append(prophet_res["risk_score"])
                 
             if valid_cases:
                 predicted_cases = int(sum(valid_cases) / len(valid_cases))
                 risk_score_val = sum(valid_scores) / len(valid_scores)
-                model_used = "demand_ensemble (tft+nbeats+prophet)"
+                model_used = "demand_ensemble (tft+nbeats)"
             else:
                 log.warning("ml.inference.failed", disease=d, error="All demand models failed")
                 
