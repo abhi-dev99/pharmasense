@@ -1,0 +1,45 @@
+digraph {
+	bgcolor=white dpi=300 overlap=false splines=true
+	Center [label="PharmaSense
+Tech Stack" color="#cbd5e1" fillcolor="#f8fafc" fontbold=true fontcolor="#0f172a" fontname=Arial fontsize=24 height=1.8 penwidth=3 shape=circle style=filled width=1.8]
+	node [color="#94a3b8" fillcolor="#ffffff" fontname=Arial fontsize=14 margin=0.4 penwidth=2 shape=box style=filled]
+	Frontend [label="Frontend & UI
+
+• Next.js 16 (App Router)
+• React 19
+• Tailwind CSS 4
+• Mapbox GL / Deck.gl" pos="4.5,0.0!"]
+	Center -> Frontend [arrowhead=none arrowtail=none color="#cbd5e1" dir=both penwidth=2]
+	Backend [label="Backend API Core
+
+• Python 3.11+
+• FastAPI Framework
+• Uvicorn Server
+• Pydantic v2" pos="2.2500000000000004,3.8971143170299736!"]
+	Center -> Backend [arrowhead=none arrowtail=none color="#cbd5e1" dir=both penwidth=2]
+	AI [label="AI / ML Models
+
+• PyTorch Geometric (ST-GNN)
+• Meta Prophet
+• LightGBM
+• Scikit-Learn" pos="-2.249999999999999,3.897114317029974!"]
+	Center -> AI [arrowhead=none arrowtail=none color="#cbd5e1" dir=both penwidth=2]
+	Data [label="Database & Cache
+
+• Supabase (PostgreSQL)
+• Redis (In-Memory)
+• SQLite (Local fallback)" pos="-4.5,5.51091059616309e-16!"]
+	Center -> Data [arrowhead=none arrowtail=none color="#cbd5e1" dir=both penwidth=2]
+	Events [label="Event Stream & APIs
+
+• Apache Kafka
+• Twilio (WhatsApp)
+• Google Trends API" pos="-2.2500000000000018,-3.897114317029973!"]
+	Center -> Events [arrowhead=none arrowtail=none color="#cbd5e1" dir=both penwidth=2]
+	Deploy [label="Infrastructure
+
+• Vercel (Edge Network)
+• Railway (Containers)
+• GitHub Actions" pos="2.249999999999997,-3.897114317029976!"]
+	Center -> Deploy [arrowhead=none arrowtail=none color="#cbd5e1" dir=both penwidth=2]
+}

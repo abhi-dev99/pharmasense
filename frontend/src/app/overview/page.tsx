@@ -205,16 +205,12 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* Dynamic ML Section */}
-      <div className="grid gap-6 md:grid-cols-3">
-        <div className="col-span-2 space-y-6">
-          <RiskPanel districtId={DISTRICT_ID} diseases="dengue,malaria,acute_diarrhoeal_disease,cholera" />
-          <OrderTable hospitalId={HOSPITAL_ID} />
-        </div>
-        <div className="col-span-1">
-          <AIBrief hospitalId={HOSPITAL_ID} />
-        </div>
-      </div>
+      {/* AI Brief — compact banner */}
+      <AIBrief hospitalId={HOSPITAL_ID} />
+
+      {/* Risk panel + full-width order table */}
+      <RiskPanel districtId={DISTRICT_ID} diseases="dengue,malaria,acute_diarrhoeal_disease,cholera" />
+      <OrderTable hospitalId={HOSPITAL_ID} />
     </div>
   );
 }

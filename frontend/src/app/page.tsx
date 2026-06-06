@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Activity, ShieldAlert, PackageCheck, Zap, Database, Lock } from "lucide-react";
+import { ArrowRight, Activity, ShieldAlert, PackageCheck, Zap, Database, Lock, Thermometer, Search, Droplets, Wind, BarChart3, Brain, Calendar, Clock } from "lucide-react";
 import { useRef } from "react";
 import { IndiaHeatmap } from "@/components/shared/IndiaHeatmap";
 
@@ -160,7 +160,108 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* More Content Section */}
+          {/* ── Signal Dashboard ───────────────────────────────────────── */}
+          <div className="mt-32 pt-24 border-t border-gray-200">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4" style={{ letterSpacing: "-0.03em" }}>
+                Every signal. One dashboard.
+              </h2>
+              <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+                Pharmasense ingests 6 real-time signals simultaneously, each powered by a distinct AI model — to detect outbreaks before health systems react.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                { label: "Epidemiological (IDSP)", icon: Activity, color: "text-red-500", bg: "bg-red-50", border: "border-red-200", value: "↑ Dengue + Diarrhoeal Rising", model: "ST-GNN", status: "ALERT", statusColor: "bg-red-100 text-red-700", detail: "80,370 cumulative dengue cases tracked across 641 districts. Diarrhoeal cases up 34% WoW." },
+                { label: "Weather (IMD)", icon: Thermometer, color: "text-orange-500", bg: "bg-orange-50", border: "border-orange-200", value: "38°C · 82% humidity", model: "GraphWaveNet", status: "HIGH RISK", statusColor: "bg-orange-100 text-orange-700", detail: "Stagnant water in 3 districts. Peak mosquito breeding window activated." },
+                { label: "Search Trend Index", icon: Search, color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200", value: "2.4× above baseline", model: "Prophet", status: "ANOMALY", statusColor: "bg-blue-100 text-blue-700", detail: "'Dengue fever symptoms' spiked 2.4× above seasonal baseline in Delhi NCR." },
+                { label: "Rainfall Index (IMD)", icon: Droplets, color: "text-cyan-500", bg: "bg-cyan-50", border: "border-cyan-200", value: "+40% of normal", model: "N-BEATS", status: "MODERATE", statusColor: "bg-cyan-100 text-cyan-700", detail: "Above-average monsoon onset. 3 districts with confirmed standing water." },
+                { label: "ML Ensemble Score", icon: BarChart3, color: "text-indigo-500", bg: "bg-indigo-50", border: "border-indigo-200", value: "66% confidence", model: "ST-GNN + TFT", status: "ACTIVE", statusColor: "bg-indigo-100 text-indigo-700", detail: "Ensemble predicts continued dengue + diarrhoeal co-rise over next 4 weeks." },
+                { label: "Inventory Stress", icon: Database, color: "text-violet-500", bg: "bg-violet-50", border: "border-violet-200", value: "14 drugs <30d cover", model: "LightGBM", status: "WATCH", statusColor: "bg-violet-100 text-violet-700", detail: "14 disease-critical drugs have less than 30 days of supply cover remaining." },
+              ].map((card) => {
+                const Icon = card.icon;
+                return (
+                  <div key={card.label} className={`bg-white border rounded-xl p-5 shadow-sm ${card.border}`}>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className={`p-2 rounded-lg ${card.bg}`}><Icon className={`w-4 h-4 ${card.color}`} /></div>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${card.statusColor}`}>{card.status}</span>
+                    </div>
+                    <div className="text-xs text-gray-400 mb-0.5">{card.label}</div>
+                    <div className="font-semibold text-gray-900 text-sm mb-1">{card.value}</div>
+                    <p className="text-xs text-gray-400 leading-relaxed mb-2">{card.detail}</p>
+                    <div className="text-[10px] text-gray-400 font-mono border-t border-gray-100 pt-1.5">
+                      Model: <span className="text-indigo-600 font-semibold">{card.model}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── 7-Model Architecture ────────────────────────────────────── */}
+          <div className="mt-32 pt-24 border-t border-gray-200">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4" style={{ letterSpacing: "-0.03em" }}>
+                7-model AI architecture.
+              </h2>
+              <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+                Each model has a distinct role. No redundancy — the ensemble covers real-time, medium-term, and strategic horizons end-to-end.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              {[
+                { name: "ST-GNN", full: "Spatio-Temporal Graph Neural Network", role: "Real-time outbreak detection & spatial spread across districts", horizon: "1–4 weeks", color: "from-red-500 to-orange-500", badge: "SPATIAL" },
+                { name: "GraphWaveNet", full: "Adaptive Graph Convolution Network", role: "Dynamic graph learning for weather + mobility signal correlation", horizon: "1–3 weeks", color: "from-orange-500 to-amber-500", badge: "GRAPH" },
+                { name: "TFT", full: "Temporal Fusion Transformer", role: "Interpretable medium-term demand forecasting with 28 covariates", horizon: "4–12 weeks", color: "from-violet-500 to-indigo-500", badge: "INTERPRETABLE" },
+                { name: "N-BEATS", full: "Neural Basis Expansion (NCD)", role: "Non-communicable disease demand curves — pure DL, no covariates", horizon: "2–8 weeks", color: "from-blue-500 to-cyan-500", badge: "PURE DL" },
+              ].map((m) => (
+                <div key={m.name} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+                  <div className={`bg-gradient-to-br ${m.color} p-4 text-white`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-2xl font-black">{m.name}</span>
+                      <span className="text-[9px] bg-white/20 px-2 py-0.5 rounded-full font-bold">{m.badge}</span>
+                    </div>
+                    <div className="text-white/75 text-[10px]">{m.full}</div>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-xs text-gray-600 leading-relaxed mb-2">{m.role}</p>
+                    <div className="flex items-center gap-1 text-[10px] text-gray-400">
+                      <Clock className="w-3 h-3" />{m.horizon}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              {[
+                { name: "Prophet", full: "Meta Prophet — Strategic Planner", role: "6–12 month demand forecasting with monsoon seasonality. Drives procurement budget planning.", horizon: "3–12 months", color: "from-emerald-500 to-teal-500", badge: "STRATEGIC", icon: Calendar },
+                { name: "LightGBM", full: "Gradient Boosting Decision Trees", role: "Inventory stress scoring and drug criticality ranking using epidemiological + inventory features.", horizon: "Continuous", color: "from-amber-500 to-yellow-500", badge: "BOOSTING", icon: Zap },
+                { name: "Gemini 1.5", full: "Google Gemini LLM", role: "Translates model outputs into executive-readable briefs and purchase order justifications in natural language.", horizon: "Real-time", color: "from-pink-500 to-rose-500", badge: "LLM", icon: Brain },
+              ].map((m) => {
+                const Icon = m.icon;
+                return (
+                  <div key={m.name} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+                    <div className={`bg-gradient-to-br ${m.color} p-4 text-white flex items-center gap-3`}>
+                      <Icon className="w-5 h-5 shrink-0" />
+                      <div>
+                        <div className="text-xl font-black">{m.name}</div>
+                        <div className="text-white/75 text-[10px]">{m.full}</div>
+                      </div>
+                      <span className="ml-auto text-[9px] bg-white/20 px-2 py-0.5 rounded-full font-bold shrink-0">{m.badge}</span>
+                    </div>
+                    <div className="p-4">
+                      <p className="text-xs text-gray-600 leading-relaxed mb-2">{m.role}</p>
+                      <div className="flex items-center gap-1 text-[10px] text-gray-400">
+                        <Clock className="w-3 h-3" />{m.horizon}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── Built for scale ─────────────────────────────────────────── */}
           <div className="mt-32 pt-24 border-t border-gray-200">
             <div className="grid md:grid-cols-2 gap-16 items-center">
               <div>
