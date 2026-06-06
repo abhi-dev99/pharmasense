@@ -390,31 +390,30 @@ export default function IntelligencePage() {
                   </div>
                 </div>
 
-                {/* Bar chart */}
-                <div className="flex items-end gap-1 h-40 mb-2">
+                {/* Bar chart — px heights so bars are always visible */}
+                <div className="flex items-end gap-1 mb-2" style={{ height: "140px" }}>
                   {displayMonths.map((month, i) => {
                     const val = displayCurve[i];
-                    const heightPct = (val / maxVal) * 100;
+                    const barPx = Math.max(4, Math.round((val / maxVal) * 130));
                     const isPeak = month === proj.peakMonth;
                     return (
-                      <div key={month} className="flex-1 flex flex-col items-center gap-1 group relative">
+                      <div key={month} className="flex-1 flex flex-col items-center justify-end group relative" style={{ height: "140px" }}>
                         {/* Tooltip */}
                         <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                           {val.toLocaleString("en-IN")} units
                         </div>
-                        <div className="w-full relative" style={{ height: "100%" }}>
-                          <motion.div
-                            initial={{ height: 0 }}
-                            animate={{ height: `${heightPct}%` }}
-                            transition={{ delay: i * 0.04, duration: 0.4 }}
-                            className={`absolute bottom-0 w-full rounded-t-sm ${
-                              isPeak
-                                ? "bg-gradient-to-t from-emerald-600 to-emerald-400"
-                                : "bg-gradient-to-t from-emerald-200 to-emerald-100"
-                            }`}
-                          />
-                        </div>
-                        <div className={`text-[9px] font-medium ${isPeak ? "text-emerald-700" : "text-gray-400"}`}>{month}</div>
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: barPx }}
+                          transition={{ delay: i * 0.04, duration: 0.45, ease: "easeOut" }}
+                          style={{ width: "100%" }}
+                          className={`rounded-t-sm shrink-0 ${
+                            isPeak
+                              ? "bg-gradient-to-t from-emerald-600 to-emerald-400"
+                              : "bg-gradient-to-t from-emerald-300 to-emerald-100"
+                          }`}
+                        />
+                        <div className={`text-[9px] font-medium mt-1 shrink-0 ${isPeak ? "text-emerald-700" : "text-gray-400"}`}>{month}</div>
                       </div>
                     );
                   })}
