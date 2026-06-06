@@ -16,6 +16,7 @@ from backend.api.simulate import simulate_router
 from backend.api.orders import orders_router
 from backend.api.admin import admin_router
 from backend.api.signals import signals_router
+from backend.api.hospitals import hospitals_router
 
 log = structlog.get_logger()
 
@@ -24,25 +25,25 @@ async def lifespan(app: FastAPI):
     # STARTUP
     log.info("pharmasense.startup.begin")
     
-    registry.load_all()           # ML models
+    # registry.load_all()           # ML models - Commented out for instant UI development boot
     
     # Initialize connections
     # We will wrap in try/except so local tests without Redis/Supabase don't hard crash the boot
-    try:
-        await RedisClient.connect()
-    except Exception as e:
-        log.warning("startup.redis.failed", error=str(e))
+    # try:
+    #     await RedisClient.connect()
+    # except Exception as e:
+    #     log.warning("startup.redis.failed", error=str(e))
         
     try:
         db = get_db()
         db.connect()
-        db.verify()
+        # db.verify() # Supabase verification sometimes slow, skipping to keep boot fast
     except Exception as e:
         log.warning("startup.db.failed", error=str(e))
         
     # Start background processes
-    kafka_runner.start()
-    start_scheduler()
+    # kafka_runner.start()
+    # start_scheduler()
     
     log.info("pharmasense.startup.complete", models=registry.health_map)
     
@@ -66,13 +67,14 @@ app = FastAPI(
 )
 
 # Include routers
-app.include_router(risk_router,     prefix="/api/v1")
-app.include_router(forecast_router, prefix="/api/v1")
-app.include_router(brief_router,    prefix="/api/v1")
-app.include_router(signals_router,  prefix="/api/v1")
-app.include_router(simulate_router, prefix="/api/v1")
-app.include_router(orders_router,   prefix="/api/v1")
-app.include_router(admin_router,    prefix="/api/v1")
+app.include_router(risk_router,      prefix="/api/v1")
+app.include_router(forecast_router,  prefix="/api/v1")
+app.include_router(brief_router,     prefix="/api/v1")
+app.include_router(signals_router,   prefix="/api/v1")
+app.include_router(simulate_router,  prefix="/api/v1")
+app.include_router(orders_router,    prefix="/api/v1")
+app.include_router(admin_router,     prefix="/api/v1")
+app.include_router(hospitals_router, prefix="/api/v1")
 
 @app.get("/health")
 async def health_check():

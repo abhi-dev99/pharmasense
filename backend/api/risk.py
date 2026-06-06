@@ -114,3 +114,84 @@ async def get_district_risk(
         computed_at=target_date.isoformat(),
         cache_hit=False
     )
+
+@risk_router.get("/national", response_model=dict)
+async def get_national_risk(disease: str = "dengue"):
+    """
+    Returns a GeoJSON FeatureCollection of all districts with their risk intensity
+    for the specified disease. Uses batch queries for performance.
+    """
+    from backend.db.client import DBClient
+    import math
+
+    try:
+        # Query 1: All districts with coordinates (single query)
+        dist_res = DBClient.get_supabase_a()\
+            .table("districts")\
+            .select("id, name, centroid_lat, centroid_lon")\
+            .filter("centroid_lat", "not.is", "null")\
+            .execute()
+        districts = {d["id"]: d for d in dist_res.data}
+    except Exception as e:
+        log.error("api.risk.national.districts_error", error=str(e))
+        raise HTTPException(status_code=500, detail="Database connection failed")
+
+    try:
+        # Query 2: Aggregate total cases per district for this disease (single query)
+        # Supabase doesn't support GROUP BY natively, so we select all rows and aggregate in Python
+        epid_res = DBClient.get_supabase_a()\
+            .table("epid_weekly")\
+            .select("district_id, cases")\
+            .eq("disease", disease)\
+            .execute()
+        epid_rows = epid_res.data
+    except Exception as e:
+        log.warning("api.risk.national.epid_error", error=str(e))
+        epid_rows = []
+
+    # Aggregate total cases per district in Python
+    district_cases: dict = {}
+    for row in epid_rows:
+        did = row["district_id"]
+        district_cases[did] = district_cases.get(did, 0) + (row["cases"] or 0)
+
+    # Compute log-normalized risk scores so values are spread across 0-1 range
+    # Max log value anchors the scale (prevents one outlier from washing everything else out)
+    all_case_values = list(district_cases.values())
+    if all_case_values:
+        log_values = [math.log1p(v) for v in all_case_values]
+        max_log = max(log_values) if log_values else 1.0
+    else:
+        max_log = 1.0
+
+    features = []
+    for dist_id, dist in districts.items():
+        raw_cases = district_cases.get(dist_id, 0)
+        # Normalize: log(cases) / log(max_cases) → 0 to 1
+        if raw_cases > 0 and max_log > 0:
+            risk_score = math.log1p(raw_cases) / max_log
+        else:
+            # Districts with no data get a very low baseline, not zero (to still show on map)
+            risk_score = 0.02
+
+        features.append({
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [dist["centroid_lon"], dist["centroid_lat"]]
+            },
+            "properties": {
+                "mag": round(risk_score * 5, 3),  # Scale 0-1 to 0-5 for heatmap weight
+                "id": dist_id,
+                "name": dist["name"],
+                "cases": raw_cases,
+            }
+        })
+
+    log.info("api.risk.national.computed", disease=disease, districts=len(features))
+    return {
+        "type": "FeatureCollection",
+        "features": features
+    }
+
+

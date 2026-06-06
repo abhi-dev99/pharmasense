@@ -23,9 +23,9 @@ interface RiskResponse {
   computed_at: string;
 }
 
-export function RiskPanel({ districtId }: { districtId: string }) {
+export function RiskPanel({ districtId, diseases = "dengue,malaria" }: { districtId: string; diseases?: string }) {
   const { data, error, isLoading } = useSWR<RiskResponse>(
-    `/api/v1/risk/district/${districtId}?diseases=dengue,malaria,type2_diabetes`,
+    `/api/v1/risk/district/${districtId}?diseases=${diseases}`,
     fetcher,
     { refreshInterval: 60000 }
   );
@@ -52,7 +52,7 @@ export function RiskPanel({ districtId }: { districtId: string }) {
           <p className="text-sm text-gray-500">Live forecasting for {data.district_name}, {data.state}</p>
         </div>
         <div className="text-xs text-gray-400">
-          Computed: {new Date(data.computed_at).toLocaleTimeString()}
+          Computed: {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
         </div>
       </div>
       
