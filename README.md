@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
   <h1>💊 Pharmasense</h1>
   <p><b>Predictive Pharmaceutical Supply Chain Platform</b></p>
 </div>
@@ -51,4 +51,3 @@ Pharmasense relies on a robust mix of static datasets and live telemetry:
 - **APIs:** Gemini API, Twilio, OpenWeatherMap
 
 ---
-*By hook or by crook, we deliver on everything we say. Think product, not project.*
