@@ -50,4 +50,4 @@ Pharmasense relies on a robust mix of static datasets and live telemetry:
 - **Infrastructure:** Docker, Redis, Apache Kafka, Supabase
 - **APIs:** Gemini API, Twilio, OpenWeatherMap
 
----
+----
